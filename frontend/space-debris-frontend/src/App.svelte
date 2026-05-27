@@ -10,14 +10,16 @@
   import { checkHealth } from './utils/api.js'
 
   // Check backend health on load
-  onMount(async () => {
-    try {
-      await checkHealth()
-      backendOnline.set(true)
-    } catch {
-      backendOnline.set(false)
-    }
-  })
+  let clockStr = '--:--:--'
+onMount(() => {
+  const tick = () => {
+    const n = new Date()
+    clockStr = n.toUTCString().split(' ')[4]
+  }
+  tick()
+  const id = setInterval(tick, 1000)
+  return () => clearInterval(id)
+})
 </script>
 
 <div class="app">
@@ -34,7 +36,7 @@
     <header class="topbar">
       <div class="topbar-left">
         <span class="tb-label">UTC</span>
-        <span class="tb-time" id="clock">
+        <span class="tb-time">{clockStr}
           {new Date().toISOString().slice(11,19)}
         </span>
       </div>
@@ -107,25 +109,48 @@
 </div>
 
 <style>
-  :global(*) {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+  @import url('https://fonts.googleapis.com/css2?family=Limelight&family=JetBrains+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+  :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :global(:root) {
+    /* NEW color palette — deep purple + gold + violet + ice white */
+    --void:       #05020f;
+    --deep:       #0a0520;
+    --surface:    #0f0a24;
+    --glass:      rgba(120,60,255,0.04);
+    --border:     rgba(140,80,255,0.14);
+    --border-dim: rgba(140,80,255,0.07);
+
+    --purple:     #7c3fff;
+    --violet:     #b060ff;
+    --gold:       #e8b84b;
+    --gold-dim:   rgba(232,184,75,0.6);
+    --white:      #f0ecff;
+    --ice:        #d4c8ff;
+    --dim:        rgba(180,160,255,0.4);
+
+    --danger:     #ff3860;
+    --warning:    #ff9020;
+    --safe:       #00e8a0;
+
+    --glow-purple: 0 0 20px rgba(124,63,255,0.35);
+    --glow-gold:   0 0 20px rgba(232,184,75,0.35);
+    --glow-danger: 0 0 20px rgba(255,56,96,0.4);
   }
+
   :global(body) {
-    background: #000814;
-    color: #fff;
+    background: var(--void);
+    color: var(--white);
     overflow: hidden;
     height: 100vh;
-    width: 100vw;
+    font-family: 'Space Grotesk', sans-serif;
   }
-  :global(#app) {
-    height: 100vh;
-    width: 100vw;
-  }
-  :global(::-webkit-scrollbar) { width: 4px; }
-  :global(::-webkit-scrollbar-track) { background: transparent; }
-  :global(::-webkit-scrollbar-thumb) { background: rgba(0,229,255,0.2); border-radius: 2px; }
+
+  :global(#app) { height: 100vh; width: 100vw; }
+
+  :global(::-webkit-scrollbar) { width: 3px; }
+  :global(::-webkit-scrollbar-thumb) { background: rgba(124,63,255,0.25); }
 
   .app {
     display: flex;
@@ -133,183 +158,150 @@
     width: 100vw;
     position: relative;
     overflow: hidden;
+    background:
+      radial-gradient(ellipse 50% 60% at 15% 50%, rgba(80,20,180,0.08) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 40% at 85% 20%, rgba(180,80,255,0.05) 0%, transparent 60%),
+      var(--void);
   }
 
-  /* CRT scanlines */
   .scanlines {
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
+      0deg, transparent, transparent 2px,
+      rgba(0,0,0,0.025) 2px, rgba(0,0,0,0.025) 4px
     );
-    pointer-events: none;
-    z-index: 1000;
+    pointer-events: none; z-index: 1000;
   }
 
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    height: 100vh;
-  }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; }
 
-  /* Top bar */
   .topbar {
-    display: flex;
-    align-items: center;
+    display: flex; align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    height: 44px;
-    min-height: 44px;
-    background: rgba(0,8,26,0.95);
-    border-bottom: 1px solid rgba(0,229,255,0.12);
-    backdrop-filter: blur(10px);
+    padding: 0 24px; height: 46px; min-height: 46px;
+    background: rgba(5,2,15,0.95);
+    border-bottom: 1px solid var(--border-dim);
+    backdrop-filter: blur(20px);
   }
-  .topbar-left { display: flex; align-items: center; gap: 8px; }
+
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+
   .tb-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: rgba(0,229,255,0.4);
-    letter-spacing: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--dim);
+    letter-spacing: 0.2em;
   }
+
   .tb-time {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 12px;
-    color: #00e5ff;
-    letter-spacing: 2px;
+    font-family: 'Limelight', cursive;
+    font-size: 15px; color: var(--gold);
+    letter-spacing: 0.08em;
   }
-  .topbar-center {}
+
   .tb-mission {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    color: var(--dim); letter-spacing: 0.15em;
+    text-transform: uppercase;
   }
+
   .topbar-right { display: flex; align-items: center; gap: 14px; }
+
   .backend-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: rgba(255,34,68,0.7);
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em;
+    color: rgba(255,56,96,0.7);
   }
-  .backend-status.online { color: rgba(0,255,136,0.8); }
+
+  .backend-status.online { color: rgba(0,232,160,0.8); }
+
   .bdot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #ff2244;
-    box-shadow: 0 0 6px #ff2244;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--danger);
+    box-shadow: 0 0 8px var(--danger);
+    animation: bdot 1.5s ease-in-out infinite;
   }
-  .backend-status.online .bdot { background: #00ff88; box-shadow: 0 0 6px #00ff88; }
+
+  .backend-status.online .bdot { background: var(--safe); box-shadow: 0 0 8px var(--safe); }
+
+  @keyframes bdot { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
   .globe-toggle {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    color: rgba(0,229,255,0.6);
-    background: transparent;
-    border: 1px solid rgba(0,229,255,0.2);
-    padding: 4px 10px;
-    border-radius: 3px;
-    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.12em;
+    color: var(--violet); background: transparent;
+    border: 1px solid rgba(176,96,255,0.25);
+    padding: 5px 12px; cursor: pointer;
     transition: all 0.2s;
   }
-  .globe-toggle:hover { border-color: rgba(0,229,255,0.5); color: #00e5ff; }
 
-  /* Body */
-  .body {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    min-height: 0;
-    overflow: hidden;
+  .globe-toggle:hover {
+    border-color: var(--violet);
+    background: rgba(124,63,255,0.08);
   }
 
-  /* Globe pane */
+  .body {
+    flex: 1; display: grid;
+    grid-template-columns: 440px 1fr;
+    min-height: 0; overflow: hidden;
+  }
+
   .globe-pane {
     position: relative;
-    background: radial-gradient(ellipse at center, #000d24 0%, #000814 100%);
-    border-right: 1px solid rgba(0,229,255,0.1);
+    background: radial-gradient(ellipse at center, #0d0525 0%, #05020f 100%);
+    border-right: 1px solid var(--border-dim);
     overflow: hidden;
   }
+
   .globe-stats {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    display: flex;
-    align-items: center;
-    gap: 0;
-    background: rgba(0,8,26,0.75);
-    border: 1px solid rgba(0,229,255,0.15);
-    border-radius: 4px;
-    backdrop-filter: blur(8px);
+    position: absolute; top: 14px; left: 14px;
+    display: flex; align-items: center;
+    background: rgba(5,2,15,0.8);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(12px);
     overflow: hidden;
   }
+
   .gs-item {
-    padding: 8px 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    padding: 8px 16px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px;
   }
+
   .gs-val {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #00e5ff;
+    font-family: 'Limelight', cursive;
+    font-size: 16px; color: var(--gold);
   }
+
   .gs-key {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 1px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px; color: var(--dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
   }
-  .gs-divider {
-    width: 1px;
-    height: 30px;
-    background: rgba(0,229,255,0.1);
-  }
+
+  .gs-divider { width: 1px; height: 32px; background: var(--border-dim); }
 
   .globe-legend {
-    position: absolute;
-    bottom: 14px;
-    right: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    background: rgba(0,8,26,0.7);
-    border: 1px solid rgba(0,229,255,0.1);
-    border-radius: 4px;
-    padding: 10px 12px;
-    backdrop-filter: blur(8px);
-  }
-  .leg-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: rgba(255,255,255,0.5);
-    letter-spacing: 1px;
-  }
-  .leg-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
+    position: absolute; bottom: 14px; right: 14px;
+    display: flex; flex-direction: column; gap: 7px;
+    background: rgba(5,2,15,0.75);
+    border: 1px solid var(--border-dim);
+    padding: 10px 14px;
+    backdrop-filter: blur(10px);
   }
 
-  /* Right panel */
+  .leg-item {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
+
   .right-panel {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #000814;
+    display: flex; flex-direction: column;
+    overflow: hidden; background: var(--void);
   }
 </style>

@@ -13,9 +13,9 @@
 
   // Risk color palette
   const riskColor = (r) => {
-    if (r > 0.7) return 0xff2244
-    if (r > 0.3) return 0xff8800
-    return 0x00e5ff
+    if (r > 0.7) return 0xff3860
+    if (r > 0.3) return 0xff9020
+    return 0x00e8a0
   }
 
   onMount(() => {
@@ -44,9 +44,9 @@
     // ── Earth ───────────────────────────────────────────────────────────────
     const earthGeo = new THREE.SphereGeometry(1, 64, 64)
     const earthMat = new THREE.MeshPhongMaterial({
-      color: 0x0a3d6b,
-      emissive: 0x001533,
-      specular: 0x4488ff,
+      color: 0x1a0a3d,
+      emissive: 0x0a0520,
+      specular: 0x8040ff,
       shininess: 25,
       wireframe: false,
     })
@@ -55,13 +55,13 @@
 
     // Grid overlay (lat/lon lines)
     const wireGeo = new THREE.SphereGeometry(1.002, 24, 24)
-    const wireMat = new THREE.MeshBasicMaterial({ color: 0x1a5fa8, wireframe: true, transparent: true, opacity: 0.15 })
+    const wireMat = new THREE.MeshBasicMaterial({ color: 0x5020a0, wireframe: true, transparent: true, opacity: 0.15 })
     earth.add(new THREE.Mesh(wireGeo, wireMat))
 
     // ── Atmosphere Glow ──────────────────────────────────────────────────────
     const glowGeo = new THREE.SphereGeometry(1.12, 32, 32)
     const glowMat = new THREE.MeshBasicMaterial({
-      color: 0x0044ff,
+      color:  0x5500cc,
       transparent: true,
       opacity: 0.07,
       side: THREE.FrontSide
@@ -70,12 +70,12 @@
     scene.add(earthGlow)
 
     const atmoGeo = new THREE.SphereGeometry(1.08, 32, 32)
-    const atmoMat = new THREE.MeshBasicMaterial({ color: 0x002299, transparent: true, opacity: 0.12, side: THREE.BackSide })
+    const atmoMat = new THREE.MeshBasicMaterial({ color: 0x3300aa, transparent: true, opacity: 0.12, side: THREE.BackSide })
     scene.add(new THREE.Mesh(atmoGeo, atmoMat))
 
     // ── Orbit Rings ──────────────────────────────────────────────────────────
     const ringRadii = [1.45, 1.8, 2.2]
-    const ringColors = [0x00e5ff, 0xff8800, 0x7700ff]
+    const ringColors = [0xe8b84b, 0xb060ff, 0x7c3fff]
     ringRadii.forEach((r, i) => {
       const geo = new THREE.TorusGeometry(r, 0.003, 8, 120)
       const mat = new THREE.MeshBasicMaterial({ color: ringColors[i], transparent: true, opacity: 0.25 })
