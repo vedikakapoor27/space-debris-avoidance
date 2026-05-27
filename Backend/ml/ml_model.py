@@ -5,19 +5,38 @@ from sklearn.metrics import classification_report, confusion_matrix
 import joblib
 
 def load_data():
-    df = pd.read_csv('simulation_output.csv')
+    # load Sanidhya's real conjunction data
+    real_df = pd.read_csv('conjunction_summary.csv')
     
-    # these are the 3 things the model learns from
-    X = df[['distance_km', 'rel_velocity', 'approach_rate']]
+    # rename columns to match our format
+    real_df = real_df.rename(columns={
+        'Object1':            'sat1',
+        'Object2':            'sat2',
+        'Minimum_Distance_km':'distance_km',
+        'CPA_Time_sec':       'rel_velocity'  
+    })
     
-    # this is what it predicts (0=safe, 1=collision)
-    y = df['collision']
+    # add approach rate column
+    real_df['approach_rate'] = -1.5
     
-    print(f"Total samples : {len(df)}")
-    print(f"Collision cases: {y.sum()}")
-    print(f"Safe cases    : {len(y) - y.sum()}")
+    # label from Sanidhya's status
+    real_df['collision'] = (real_df['Status'] == 'WARNING').astype(int)
+    real_df = real_df[['sat1','sat2','distance_km','rel_velocity','approach_rate','collision']]
+    
+    # combine with existing simulation data
+    sim_df = pd.read_csv('simulation_output.csv')
+    
+    combined = pd.concat([sim_df, real_df], ignore_index=True)
+    combined = combined.sample(frac=1, random_state=42).reset_index(drop=True)
+    
+    X = combined[['distance_km', 'rel_velocity', 'approach_rate']]
+    y = combined['collision']
+    
+    print(f"Real data rows  : {len(real_df)}")
+    print(f"Sim data rows   : {len(sim_df)}")
+    print(f"Total samples   : {len(combined)}")
+    print(f"Collision cases : {y.sum()}")
     return X, y
-
 
 def train_model(X, y):
     # split data: 80% for training, 20% for testing
