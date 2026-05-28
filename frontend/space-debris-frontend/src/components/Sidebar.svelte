@@ -1,27 +1,38 @@
 <script>
-  import { activePanel, alertCount } from '../stores/appStore.js'
+  import { activePanel, alertCount, theme } from '../stores/appStore.js'
 
   const navItems = [
-    { id: 'dashboard',     icon: '⬡', label: 'DASHBOARD' },
-    { id: 'predict',       icon: '⟁', label: 'RISK PREDICT' },
-    { id: 'conjunctions',  icon: '◎', label: 'CONJUNCTIONS' },
-    { id: 'telemetry',     icon: '⎍', label: 'TELEMETRY' },
+    { id: 'dashboard',    icon: '⬡', label: 'DASHBOARD',    sub: 'Overview' },
+    { id: 'predict',      icon: '⟁', label: 'RISK PREDICT', sub: 'ML Analysis' },
+    { id: 'conjunctions', icon: '◎', label: 'CONJUNCTIONS', sub: 'TCA Events' },
+    { id: 'telemetry',    icon: '⎍', label: 'TELEMETRY',    sub: 'Live Feed' },
   ]
 </script>
 
-<nav class="sidebar">
+<nav class="sidebar" data-theme={$theme}>
+
   <div class="logo">
-    <div class="logo-mark">⬡</div>
+    <div class="logo-sigil">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="14" stroke="var(--gold)" stroke-width="1" opacity="0.6"/>
+        <circle cx="16" cy="16" r="8"  stroke="var(--accent)" stroke-width="1" opacity="0.8"/>
+        <circle cx="16" cy="16" r="3"  fill="var(--gold)" opacity="0.9"/>
+        <line x1="2"  y1="16" x2="30" y2="16" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
+        <line x1="16" y1="2"  x2="16" y2="30" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+    </div>
     <div class="logo-text">
-      <span class="logo-name">ORION</span>
-      <span class="logo-sub">DEBRIS AVOIDANCE v1.0</span>
+      <span class="logo-name">ASTRAEUS</span>
+      <span class="logo-sub">SPACE DEBRIS SENTINEL</span>
     </div>
   </div>
 
-  <div class="status-dot">
-    <span class="dot pulse"></span>
-    <span class="status-text">SYSTEM NOMINAL</span>
+  <div class="sys-status">
+    <span class="pulse-dot"></span>
+    <span class="sys-text">SYSTEM NOMINAL</span>
   </div>
+
+  <div class="nav-section-label">NAVIGATION</div>
 
   <ul class="nav-list">
     {#each navItems as item}
@@ -32,9 +43,15 @@
           on:click={() => activePanel.set(item.id)}
         >
           <span class="nav-icon">{item.icon}</span>
-          <span class="nav-label">{item.label}</span>
+          <div class="nav-text">
+            <span class="nav-label">{item.label}</span>
+            <span class="nav-sub">{item.sub}</span>
+          </div>
           {#if item.id === 'conjunctions' && $alertCount > 0}
             <span class="badge">{$alertCount}</span>
+          {/if}
+          {#if $activePanel === item.id}
+            <span class="active-bar"></span>
           {/if}
         </button>
       </li>
@@ -42,161 +59,180 @@
   </ul>
 
   <div class="sidebar-footer">
-    <div class="footer-stat">
-      <span class="fstat-val">847</span>
-      <span class="fstat-key">TRACKED</span>
+    <div class="footer-row">
+      <span class="fkey">TRACKED</span>
+      <span class="fval">847</span>
     </div>
-    <div class="footer-stat">
-      <span class="fstat-val" style="color: #ff2244">{$alertCount}</span>
-      <span class="fstat-key">ALERTS</span>
+    <div class="footer-row">
+      <span class="fkey">ALERTS</span>
+      <span class="fval danger">{$alertCount}</span>
     </div>
-    <div class="footer-stat">
-      <span class="fstat-val" style="color:#00ff88">12</span>
-      <span class="fstat-key">SATS</span>
+    <div class="footer-row">
+      <span class="fkey">SATS</span>
+      <span class="fval safe">12</span>
     </div>
+    <div class="footer-divider"></div>
+    <div class="footer-version">v2.4.1 · ASTRAEUS</div>
   </div>
+
 </nav>
 
 <style>
   .sidebar {
-    width: 200px;
-    min-width: 200px;
-    height: 100%;
-    background: linear-gradient(180deg, #00081a 0%, #000d26 100%);
-    border-right: 1px solid rgba(0, 229, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    gap: 0;
+    width: 210px; min-width: 210px; height: 100%;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-dim);
+    display: flex; flex-direction: column;
+    padding: 0;
+    transition: background 0.4s;
   }
 
   .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 18px 20px;
-    border-bottom: 1px solid rgba(0,229,255,0.08);
-  }
-  .logo-mark {
-    font-size: 24px;
-    color: #00e5ff;
-    line-height: 1;
-    filter: drop-shadow(0 0 8px #00e5ff);
-  }
-  .logo-text { display: flex; flex-direction: column; }
-  .logo-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #00e5ff;
-    letter-spacing: 3px;
-  }
-  .logo-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px;
-    color: rgba(0,229,255,0.4);
-    letter-spacing: 1px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid var(--border-dim);
   }
 
-  .status-dot {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 18px;
+  .logo-sigil { flex-shrink: 0; }
+
+  .logo-text { display: flex; flex-direction: column; gap: 2px; }
+
+  .logo-name {
+    font-family: 'Limelight', cursive;
+    font-size: 15px; color: var(--gold);
+    letter-spacing: 0.12em;
+    line-height: 1;
   }
-  .dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: #00ff88;
-    box-shadow: 0 0 8px #00ff88;
+
+  .logo-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7px; color: var(--text-dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
   }
-  .dot.pulse { animation: pulse 2s infinite; }
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50% { opacity: 0.3; }
+
+  .sys-status {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border-dim);
   }
-  .status-text {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: #00ff88;
-    letter-spacing: 2px;
+
+  .pulse-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--safe);
+    animation: pulse 2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+
+  .sys-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--safe);
+    letter-spacing: 0.14em; text-transform: uppercase;
+  }
+
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; color: var(--text-dim);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    padding: 14px 18px 6px;
   }
 
   .nav-list {
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    list-style: none; flex: 1;
+    display: flex; flex-direction: column;
+    gap: 2px; padding: 4px 10px;
   }
+
   .nav-btn {
     width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 11px 18px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: rgba(255,255,255,0.4);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-align: left;
-    transition: all 0.2s;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px;
+    background: none; border: none; cursor: pointer;
+    color: var(--text-dim);
+    text-align: left; transition: all 0.2s;
     position: relative;
+    border-radius: 4px;
   }
+
   .nav-btn:hover {
-    color: rgba(0,229,255,0.8);
-    background: rgba(0,229,255,0.05);
+    color: var(--accent-hi);
+    background: var(--glass);
   }
+
   .nav-btn.active {
-    color: #00e5ff;
-    background: rgba(0,229,255,0.08);
-    border-left: 2px solid #00e5ff;
+    color: var(--gold);
+    background: rgba(232,184,75,0.07);
   }
+
   .nav-icon {
-    font-size: 14px;
-    width: 18px;
-    text-align: center;
+    font-size: 15px; width: 20px;
+    text-align: center; flex-shrink: 0;
   }
-  .nav-label { flex: 1; }
+
+  .nav-text {
+    display: flex; flex-direction: column; gap: 1px;
+    flex: 1;
+  }
+
+  .nav-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .nav-sub {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px; opacity: 0.5;
+    line-height: 1;
+  }
+
+  .active-bar {
+    position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 2px; background: var(--gold);
+    border-radius: 0 2px 2px 0;
+  }
+
   .badge {
-    background: #ff2244;
+    background: var(--danger);
     color: white;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    padding: 1px 5px;
-    border-radius: 8px;
-    box-shadow: 0 0 6px #ff2244;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; padding: 1px 6px;
+    border-radius: 10px;
   }
 
   .sidebar-footer {
-    display: flex;
-    justify-content: space-around;
-    padding: 16px 12px;
-    border-top: 1px solid rgba(0,229,255,0.08);
-    margin-top: auto;
+    padding: 14px 18px;
+    border-top: 1px solid var(--border-dim);
+    display: flex; flex-direction: column; gap: 8px;
   }
-  .footer-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+
+  .footer-row {
+    display: flex; justify-content: space-between; align-items: center;
   }
-  .fstat-val {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    color: #00e5ff;
+
+  .fkey {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; color: var(--text-dim);
+    letter-spacing: 0.15em; text-transform: uppercase;
   }
-  .fstat-key {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 7px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1px;
+
+  .fval {
+    font-family: 'Limelight', cursive;
+    font-size: 14px; color: var(--accent-hi);
+  }
+
+  .fval.danger { color: var(--danger); }
+  .fval.safe   { color: var(--safe); }
+
+  .footer-divider {
+    height: 1px; background: var(--border-dim); margin: 2px 0;
+  }
+
+  .footer-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; color: var(--text-dim);
+    letter-spacing: 0.1em; text-align: center;
   }
 </style>

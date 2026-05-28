@@ -4,36 +4,26 @@
   import { selectedObject } from '../stores/appStore.js'
 
   let conjunctions = getMockConjunctions()
-  let tick = 0
   let interval
 
-  // Simulated live stats
-  let stats = {
-    tracked:     847,
-    active_sats: 12,
-    high_risk:   2,
-    avg_distance: 156.4
-  }
+  let stats = { tracked: 847, active_sats: 12, high_risk: 2, avg_distance: 156.4 }
 
-  // Simulate slight fluctuation for "live" feel
   onMount(() => {
     interval = setInterval(() => {
       stats.avg_distance = +(154 + Math.random() * 6).toFixed(1)
-      tick++
     }, 2000)
   })
   onDestroy(() => clearInterval(interval))
 
-  const riskClass = r => r === 'HIGH' ? 'high' : r === 'MEDIUM' ? 'med' : 'low'
+  const riskCls = r => r === 'HIGH' ? 'high' : r === 'MEDIUM' ? 'med' : 'low'
 </script>
 
 <div class="panel">
 
-  <!-- Header -->
   <div class="panel-header">
-    <div>
-      <h2 class="panel-title">MISSION OVERVIEW</h2>
-      <p class="panel-sub">Real-time orbital collision monitoring</p>
+    <div class="header-left">
+      <div class="header-eyebrow">MISSION OVERVIEW</div>
+      <h2 class="header-title">Orbital Collision<br>Monitoring</h2>
     </div>
     <div class="live-badge">
       <span class="live-dot"></span>
@@ -41,34 +31,32 @@
     </div>
   </div>
 
-  <!-- Stat Cards -->
   <div class="stat-grid">
     <div class="stat-card">
-      <div class="stat-icon blue">◈</div>
-      <div class="stat-val">{stats.tracked}</div>
-      <div class="stat-key">TRACKED OBJECTS</div>
+      <div class="stat-num">{stats.tracked}</div>
+      <div class="stat-label">Tracked Objects</div>
+      <div class="stat-bar" style="--pct:85%; --c:var(--accent)"></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon green">◉</div>
-      <div class="stat-val">{stats.active_sats}</div>
-      <div class="stat-key">ACTIVE SATELLITES</div>
+      <div class="stat-num safe">{stats.active_sats}</div>
+      <div class="stat-label">Active Satellites</div>
+      <div class="stat-bar" style="--pct:40%; --c:var(--safe)"></div>
     </div>
-    <div class="stat-card danger">
-      <div class="stat-icon red">⚠</div>
-      <div class="stat-val" style="color:#ff2244">{stats.high_risk}</div>
-      <div class="stat-key">HIGH RISK ALERTS</div>
+    <div class="stat-card danger-card">
+      <div class="stat-num danger">{stats.high_risk}</div>
+      <div class="stat-label">High Risk Alerts</div>
+      <div class="stat-bar" style="--pct:20%; --c:var(--danger)"></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon orange">⬡</div>
-      <div class="stat-val">{stats.avg_distance} <span class="unit">km</span></div>
-      <div class="stat-key">AVG MISS DISTANCE</div>
+      <div class="stat-num gold">{stats.avg_distance}<span class="unit"> km</span></div>
+      <div class="stat-label">Avg Miss Distance</div>
+      <div class="stat-bar" style="--pct:60%; --c:var(--gold)"></div>
     </div>
   </div>
 
-  <!-- Conjunction Events -->
   <div class="section">
-    <div class="section-header">
-      <span class="section-title">⚡ ACTIVE CONJUNCTIONS</span>
+    <div class="section-head">
+      <span class="section-title">Active Conjunctions</span>
       <span class="section-count">{conjunctions.length} events</span>
     </div>
     <table class="conj-table">
@@ -77,8 +65,8 @@
           <th>ID</th>
           <th>OBJECT 1</th>
           <th>OBJECT 2</th>
-          <th>DIST (km)</th>
-          <th>VEL (km/s)</th>
+          <th>DIST</th>
+          <th>VEL</th>
           <th>TCA</th>
           <th>RISK</th>
         </tr>
@@ -89,35 +77,34 @@
             <td class="mono dim">{c.id}</td>
             <td class="mono">{c.object1}</td>
             <td class="mono">{c.object2}</td>
-            <td class="mono">{c.distance}</td>
+            <td class="mono">{c.distance} km</td>
             <td class="mono">{c.velocity}</td>
             <td class="mono dim">{c.time}</td>
-            <td>
-              <span class="risk-pill {riskClass(c.risk)}">{c.risk}</span>
-            </td>
+            <td><span class="pill {riskCls(c.risk)}">{c.risk}</span></td>
           </tr>
         {/each}
       </tbody>
     </table>
   </div>
 
-  <!-- Selected Object Info -->
   {#if $selectedObject}
     <div class="section">
-      <div class="section-header">
-        <span class="section-title">◎ SELECTED OBJECT</span>
+      <div class="section-head">
+        <span class="section-title">Selected Object</span>
       </div>
       <div class="obj-detail">
-        <div class="obj-row"><span>ID</span><span>{$selectedObject.label}</span></div>
-        <div class="obj-row"><span>POSITION X</span><span>{$selectedObject.x.toFixed(4)}</span></div>
-        <div class="obj-row"><span>POSITION Y</span><span>{$selectedObject.y.toFixed(4)}</span></div>
-        <div class="obj-row"><span>POSITION Z</span><span>{$selectedObject.z.toFixed(4)}</span></div>
-        <div class="obj-row">
-          <span>RISK INDEX</span>
-          <span class="risk-pill {riskClass($selectedObject.risk > 0.7 ? 'HIGH' : $selectedObject.risk > 0.3 ? 'MEDIUM' : 'LOW')}">
-            {($selectedObject.risk * 100).toFixed(1)}%
-          </span>
-        </div>
+        {#each [
+          ['LABEL',    $selectedObject.label],
+          ['POS X',    $selectedObject.x.toFixed(4)],
+          ['POS Y',    $selectedObject.y.toFixed(4)],
+          ['POS Z',    $selectedObject.z.toFixed(4)],
+          ['RISK IDX', ($selectedObject.risk*100).toFixed(1)+'%']
+        ] as [k,v]}
+          <div class="obj-row">
+            <span class="obj-key">{k}</span>
+            <span class="obj-val">{v}</span>
+          </div>
+        {/each}
       </div>
     </div>
   {/if}
@@ -126,178 +113,155 @@
 
 <style>
   .panel {
-    flex: 1;
-    padding: 24px;
+    flex: 1; padding: 28px;
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    display: flex; flex-direction: column; gap: 24px;
+    background: var(--panel-bg);
   }
 
   .panel-header {
-    display: flex;
-    align-items: flex-start;
+    display: flex; align-items: flex-start;
     justify-content: space-between;
   }
-  .panel-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: #00e5ff;
-    letter-spacing: 4px;
-    margin: 0;
+
+  .header-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--text-dim);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    margin-bottom: 6px;
   }
-  .panel-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    margin: 4px 0 0;
+
+  .header-title {
+    font-family: 'Limelight', cursive;
+    font-size: 22px; color: var(--text);
+    letter-spacing: 0.04em; line-height: 1.15;
+    font-weight: 400;
   }
+
   .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #00ff88;
-    letter-spacing: 2px;
-    border: 1px solid rgba(0,255,136,0.3);
-    padding: 4px 10px;
-    border-radius: 3px;
+    display: flex; align-items: center; gap: 7px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--safe);
+    letter-spacing: 0.18em;
+    border: 1px solid rgba(0,232,160,0.25);
+    padding: 5px 12px;
   }
   .live-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #00ff88;
-    box-shadow: 0 0 6px #00ff88;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--safe);
     animation: pulse 1.5s infinite;
   }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
-  /* Stat grid */
   .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
   }
+
   .stat-card {
-    background: rgba(0,229,255,0.03);
-    border: 1px solid rgba(0,229,255,0.12);
-    border-radius: 6px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+    background: var(--glass);
+    border: 1px solid var(--border-dim);
+    padding: 18px 16px 14px;
+    position: relative; overflow: hidden;
     transition: border-color 0.2s;
   }
-  .stat-card:hover { border-color: rgba(0,229,255,0.35); }
-  .stat-card.danger { border-color: rgba(255,34,68,0.2); background: rgba(255,34,68,0.03); }
-  .stat-icon { font-size: 18px; }
-  .stat-icon.blue  { color: #00e5ff; text-shadow: 0 0 10px #00e5ff; }
-  .stat-icon.green { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
-  .stat-icon.red   { color: #ff2244; text-shadow: 0 0 10px #ff2244; }
-  .stat-icon.orange{ color: #ff8800; text-shadow: 0 0 10px #ff8800; }
-  .stat-val {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: #fff;
+  .stat-card:hover { border-color: var(--border); }
+  .stat-card.danger-card { border-color: rgba(255,56,96,0.15); }
+
+  .stat-num {
+    font-family: 'Limelight', cursive;
+    font-size: 28px; color: var(--accent-hi);
+    line-height: 1; margin-bottom: 6px;
   }
-  .unit { font-size: 11px; color: rgba(255,255,255,0.4); }
-  .stat-key {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1.5px;
+  .stat-num.safe   { color: var(--safe); }
+  .stat-num.danger { color: var(--danger); }
+  .stat-num.gold   { color: var(--gold); }
+  .unit { font-size: 13px; }
+
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; color: var(--text-dim);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 12px;
   }
 
-  /* Sections */
+  .stat-bar {
+    position: absolute; bottom: 0; left: 0;
+    width: var(--pct); height: 2px;
+    background: var(--c);
+    transition: width 1s ease;
+  }
+
   .section {
-    background: rgba(0,229,255,0.02);
-    border: 1px solid rgba(0,229,255,0.1);
-    border-radius: 6px;
+    border: 1px solid var(--border-dim);
     overflow: hidden;
   }
-  .section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(0,229,255,0.08);
-    background: rgba(0,229,255,0.04);
-  }
-  .section-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    color: #00e5ff;
-    letter-spacing: 3px;
-  }
-  .section-count {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: rgba(255,255,255,0.3);
+
+  .section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--border-dim);
+    background: var(--glass);
   }
 
-  /* Table */
-  .conj-table {
-    width: 100%;
-    border-collapse: collapse;
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--accent-hi);
+    letter-spacing: 0.18em; text-transform: uppercase;
   }
+
+  .section-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--text-dim);
+  }
+
+  .conj-table { width: 100%; border-collapse: collapse; }
+
   .conj-table th {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: rgba(0,229,255,0.5);
-    padding: 8px 12px;
-    text-align: left;
-    border-bottom: 1px solid rgba(0,229,255,0.06);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px; letter-spacing: 0.15em;
+    color: var(--text-dim);
+    padding: 8px 12px; text-align: left;
+    border-bottom: 1px solid var(--border-dim);
+    text-transform: uppercase;
   }
+
   .conj-row td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid var(--border-dim);
     transition: background 0.15s;
   }
-  .conj-row:hover td { background: rgba(0,229,255,0.04); }
-  .conj-row.high-row td { background: rgba(255,34,68,0.04); }
+  .conj-row:last-child td { border-bottom: none; }
+  .conj-row:hover td { background: var(--glass); }
+  .conj-row.high-row td { background: rgba(255,56,96,0.03); }
+
   .mono {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: rgba(255,255,255,0.75);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text);
   }
-  .dim { color: rgba(255,255,255,0.35) !important; }
+  .dim { color: var(--text-dim) !important; }
 
-  .risk-pill {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    padding: 2px 8px;
-    border-radius: 3px;
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; font-weight: 500;
+    letter-spacing: 0.1em; padding: 2px 9px;
+    text-transform: uppercase;
   }
-  .risk-pill.high   { background: rgba(255,34,68,0.2);  color: #ff2244; border: 1px solid rgba(255,34,68,0.4); }
-  .risk-pill.med    { background: rgba(255,136,0,0.2);  color: #ff8800; border: 1px solid rgba(255,136,0,0.4); }
-  .risk-pill.low    { background: rgba(0,229,255,0.1);  color: #00e5ff; border: 1px solid rgba(0,229,255,0.3); }
+  .pill.high   { background: rgba(255,56,96,0.12);  color: var(--danger);  border: 1px solid rgba(255,56,96,0.3); }
+  .pill.med    { background: rgba(255,144,32,0.12); color: var(--warning); border: 1px solid rgba(255,144,32,0.3); }
+  .pill.low    { background: rgba(0,232,160,0.08);  color: var(--safe);    border: 1px solid rgba(0,232,160,0.25); }
 
-  /* Object detail */
-  .obj-detail { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .obj-detail { padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
   .obj-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 1px solid var(--border-dim);
   }
-  .obj-row span:first-child {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 10px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 1.5px;
+  .obj-row:last-child { border-bottom: none; }
+  .obj-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; color: var(--text-dim); letter-spacing: 0.15em;
   }
-  .obj-row span:last-child {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 11px;
-    color: rgba(255,255,255,0.8);
+  .obj-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--text);
   }
 </style>
