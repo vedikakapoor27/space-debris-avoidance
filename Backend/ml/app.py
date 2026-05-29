@@ -153,3 +153,56 @@ def stats():
         history = load_history()
 
         if not history:
+            return jsonify({
+                'status':            'success',
+                'total_predictions': 0,
+                'message':           'No predictions yet'
+            })
+
+        total = len(history)
+
+        # count by risk level
+        high   = len([h for h in history if h.get('risk_level') == 'HIGH'])
+        medium = len([h for h in history if h.get('risk_level') == 'MEDIUM'])
+        low    = len([h for h in history if h.get('risk_level') == 'LOW'])
+
+        # average probability
+        probs   = [h.get('probability', 0) for h in history]
+        avg_prob = round(sum(probs) / len(probs), 2)
+        max_prob = round(max(probs), 2)
+        min_prob = round(min(probs), 2)
+
+        # most recent prediction
+        latest = history[0] if history else None
+
+        # high risk percentage
+        high_pct = round((high / total) * 100, 1)
+
+        return jsonify({
+            'status':            'success',
+            'total_predictions': total,
+            'by_risk': {
+                'HIGH':   high,
+                'MEDIUM': medium,
+                'LOW':    low
+            },
+            'percentages': {
+                'HIGH':   high_pct,
+                'MEDIUM': round((medium / total) * 100, 1),
+                'LOW':    round((low / total) * 100, 1)
+            },
+            'probability': {
+                'average': avg_prob,
+                'max':     max_prob,
+                'min':     min_prob
+            },
+            'latest':            latest,
+            'alert':             high_pct > 30
+        })
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
