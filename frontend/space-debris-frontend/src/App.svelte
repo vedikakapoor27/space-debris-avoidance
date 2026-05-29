@@ -10,6 +10,7 @@
   import TelemetryPanel from './components/TelemetryPanel.svelte'
   import { activePanel, backendOnline, globeRotating, theme } from './stores/appStore.js'
   import { checkHealth } from './utils/api.js'
+  import HistoryPanel from './components/HistoryPanel.svelte'
 
   let clockStr = '--:--:--'
   let prevPanel = 'dashboard'

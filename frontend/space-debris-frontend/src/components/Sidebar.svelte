@@ -8,6 +8,7 @@
     { id: 'predict',      icon: '⟁', label: 'Risk Predict', sub: 'ML Analysis' },
     { id: 'conjunctions', icon: '◎', label: 'Conjunctions', sub: 'TCA Events' },
     { id: 'telemetry',    icon: '⎍', label: 'Telemetry',    sub: 'Live Feed' },
+    { id: 'history', icon: '◈', label: 'History', sub: 'Analytics' },
   ]
 
   function go(id) { activePanel.set(id) }
@@ -115,7 +116,7 @@
   .logo-name {
     font-family: 'Syne', sans-serif;
     font-size: 15px; font-weight: 800;
-    color: var(--gold); letter-spacing: 0.1em; line-height: 1;
+    color: #e2e8f0; letter-spacing: 0.1em; line-height: 1;
   }
 
   .logo-sub {

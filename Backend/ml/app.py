@@ -8,7 +8,7 @@ from risk_scorer import score_from_features
 from avoidance import full_assessment
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173"])
 
 # load model once when server starts
 model = joblib.load('collision_model.pkl')
