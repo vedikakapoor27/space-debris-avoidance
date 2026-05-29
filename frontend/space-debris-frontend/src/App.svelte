@@ -126,8 +126,6 @@
 </div>
 
 <style>
-  /* ── FONTS ── */
-  :global(@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap'));
 
   /* ══════════════════════════════════════
      DARK THEME  —  deep void purple
@@ -143,7 +141,7 @@
     --accent:       #7c3aed;
     --accent-hi:    #a78bfa;
     --accent-glow:  0 0 28px rgba(124,58,237,0.35);
-    --gold:         #f0c040;
+    --gold:         #e2e8f0;
     --gold-dim:     rgba(240,192,64,0.5);
     --violet:       #c084fc;
     --text:         #ede9fe;
@@ -176,7 +174,7 @@
     --accent:       #2563eb;
     --accent-hi:    #93c5fd;
     --accent-glow:  0 0 28px rgba(37,99,235,0.35);
-    --gold:         #f59e0b;
+    --gold:         #e2e8f0;
     --gold-dim:     rgba(245,158,11,0.5);
     --violet:       #60a5fa;
     --text:         #e0f2fe;
@@ -246,10 +244,9 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px; color: var(--text-dim); letter-spacing: 0.2em;
   }
-
   .time-val {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 15px; color: var(--gold); letter-spacing: 0.06em;
+    font-size: 15px;   color: #e2e8f0; letter-spacing: 0.06em;
     font-weight: 500;
   }
 
