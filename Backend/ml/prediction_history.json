@@ -1,6 +1,66 @@
 [
   {
     "status": "success",
+    "timestamp": "2026-05-29T22:36:00.206261",
+    "input": {
+      "distance_km": 50.0,
+      "rel_velocity": 7.0,
+      "approach_rate": -5.0
+    },
+    "risk_level": "HIGH",
+    "probability": 75.0,
+    "confidence": "MEDIUM",
+    "color": "RED",
+    "message": "Immediate action required \u2014 collision risk is critical",
+    "action": "MANEUVER REQUIRED",
+    "maneuver_type": "Raise orbit",
+    "maneuver_km": "10.0 km",
+    "fuel_cost_kg": "2.45 kg",
+    "time_window": "Act within 1 hour",
+    "urgency": "IMMEDIATE"
+  },
+  {
+    "status": "success",
+    "timestamp": "2026-05-29T22:26:53.916893",
+    "input": {
+      "distance_km": 35.0,
+      "rel_velocity": 7.0,
+      "approach_rate": -4.0
+    },
+    "risk_level": "HIGH",
+    "probability": 74.0,
+    "confidence": "MEDIUM",
+    "color": "RED",
+    "message": "Immediate action required \u2014 collision risk is critical",
+    "action": "MANEUVER REQUIRED",
+    "maneuver_type": "Raise orbit",
+    "maneuver_km": "8.5 km",
+    "fuel_cost_kg": "2.45 kg",
+    "time_window": "Act within 1 hour",
+    "urgency": "IMMEDIATE"
+  },
+  {
+    "status": "success",
+    "timestamp": "2026-05-29T22:26:38.771342",
+    "input": {
+      "distance_km": 50.0,
+      "rel_velocity": 7.0,
+      "approach_rate": -5.0
+    },
+    "risk_level": "HIGH",
+    "probability": 75.0,
+    "confidence": "MEDIUM",
+    "color": "RED",
+    "message": "Immediate action required \u2014 collision risk is critical",
+    "action": "MANEUVER REQUIRED",
+    "maneuver_type": "Raise orbit",
+    "maneuver_km": "10.0 km",
+    "fuel_cost_kg": "2.45 kg",
+    "time_window": "Act within 1 hour",
+    "urgency": "IMMEDIATE"
+  },
+  {
+    "status": "success",
     "timestamp": "2026-05-29T22:16:08.616118",
     "input": {
       "distance_km": 8.0,

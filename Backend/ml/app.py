@@ -51,7 +51,6 @@ def home():
             '/health':       'GET  - check if API is running',
             '/history':      'GET  - last 100 predictions',
             '/stats':        'GET  - prediction statistics',
-            '/history/clear':'DELETE - clear history',
         }
     })
 
