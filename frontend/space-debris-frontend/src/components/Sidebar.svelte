@@ -1,236 +1,259 @@
 <script>
   import { activePanel, alertCount, theme } from '../stores/appStore.js'
+  import { fly } from 'svelte/transition'
+  import { cubicOut } from 'svelte/easing'
 
   const navItems = [
-    { id: 'dashboard',    icon: '⬡', label: 'DASHBOARD',    sub: 'Overview' },
-    { id: 'predict',      icon: '⟁', label: 'RISK PREDICT', sub: 'ML Analysis' },
-    { id: 'conjunctions', icon: '◎', label: 'CONJUNCTIONS', sub: 'TCA Events' },
-    { id: 'telemetry',    icon: '⎍', label: 'TELEMETRY',    sub: 'Live Feed' },
+    { id: 'dashboard',    icon: '⬡', label: 'Dashboard',    sub: 'Overview' },
+    { id: 'predict',      icon: '⟁', label: 'Risk Predict', sub: 'ML Analysis' },
+    { id: 'conjunctions', icon: '◎', label: 'Conjunctions', sub: 'TCA Events' },
+    { id: 'telemetry',    icon: '⎍', label: 'Telemetry',    sub: 'Live Feed' },
   ]
+
+  function go(id) { activePanel.set(id) }
 </script>
 
-<nav class="sidebar" data-theme={$theme}>
+<nav class="sidebar">
 
   <div class="logo">
-    <div class="logo-sigil">
-      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="14" stroke="var(--gold)" stroke-width="1" opacity="0.6"/>
-        <circle cx="16" cy="16" r="8"  stroke="var(--accent)" stroke-width="1" opacity="0.8"/>
-        <circle cx="16" cy="16" r="3"  fill="var(--gold)" opacity="0.9"/>
-        <line x1="2"  y1="16" x2="30" y2="16" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
-        <line x1="16" y1="2"  x2="16" y2="30" stroke="var(--accent)" stroke-width="0.5" opacity="0.3"/>
+    <div class="sigil">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <circle cx="18" cy="18" r="16" stroke="var(--gold)" stroke-width="0.8" opacity="0.5"/>
+        <circle cx="18" cy="18" r="10" stroke="var(--accent-hi)" stroke-width="0.8" opacity="0.7"/>
+        <circle cx="18" cy="18" r="4"  fill="var(--gold)" opacity="0.9"/>
+        <line x1="2"  y1="18" x2="34" y2="18" stroke="var(--accent-hi)" stroke-width="0.4" opacity="0.25"/>
+        <line x1="18" y1="2"  x2="18" y2="34" stroke="var(--accent-hi)" stroke-width="0.4" opacity="0.25"/>
+        <circle cx="18" cy="18" r="16" stroke="var(--accent)" stroke-width="0.4" stroke-dasharray="3 6" opacity="0.3">
+          <animateTransform attributeName="transform" type="rotate" from="0 18 18" to="360 18 18" dur="30s" repeatCount="indefinite"/>
+        </circle>
       </svg>
     </div>
     <div class="logo-text">
       <span class="logo-name">ASTRAEUS</span>
-      <span class="logo-sub">SPACE DEBRIS SENTINEL</span>
+      <span class="logo-sub">Space Debris Sentinel</span>
     </div>
   </div>
 
-  <div class="sys-status">
-    <span class="pulse-dot"></span>
-    <span class="sys-text">SYSTEM NOMINAL</span>
+  <div class="sys-pill">
+    <span class="sys-dot"></span>
+    <span class="sys-label">System Nominal</span>
   </div>
 
-  <div class="nav-section-label">NAVIGATION</div>
+  <div class="nav-label-sec">Navigation</div>
 
   <ul class="nav-list">
-    {#each navItems as item}
+    {#each navItems as item, i}
       <li>
         <button
-          class="nav-btn"
+          class="nav-item"
           class:active={$activePanel === item.id}
-          on:click={() => activePanel.set(item.id)}
+          on:click={() => go(item.id)}
+          style="animation-delay:{i*60}ms"
         >
-          <span class="nav-icon">{item.icon}</span>
-          <div class="nav-text">
-            <span class="nav-label">{item.label}</span>
+          <span class="nav-ico">{item.icon}</span>
+          <div class="nav-txt">
+            <span class="nav-lbl">{item.label}</span>
             <span class="nav-sub">{item.sub}</span>
           </div>
+
           {#if item.id === 'conjunctions' && $alertCount > 0}
             <span class="badge">{$alertCount}</span>
           {/if}
+
+          <span class="nav-arrow" class:visible={$activePanel === item.id}>›</span>
+
           {#if $activePanel === item.id}
-            <span class="active-bar"></span>
+            <span class="active-line"></span>
           {/if}
         </button>
       </li>
     {/each}
   </ul>
 
-  <div class="sidebar-footer">
-    <div class="footer-row">
-      <span class="fkey">TRACKED</span>
-      <span class="fval">847</span>
+  <div class="footer">
+    <div class="footer-stats">
+      <div class="fstat">
+        <span class="fval">{847}</span>
+        <span class="fkey">Tracked</span>
+      </div>
+      <div class="fstat-div"></div>
+      <div class="fstat">
+        <span class="fval" style="color:var(--danger)">{$alertCount}</span>
+        <span class="fkey">Alerts</span>
+      </div>
+      <div class="fstat-div"></div>
+      <div class="fstat">
+        <span class="fval" style="color:var(--safe)">12</span>
+        <span class="fkey">Sats</span>
+      </div>
     </div>
-    <div class="footer-row">
-      <span class="fkey">ALERTS</span>
-      <span class="fval danger">{$alertCount}</span>
-    </div>
-    <div class="footer-row">
-      <span class="fkey">SATS</span>
-      <span class="fval safe">12</span>
-    </div>
-    <div class="footer-divider"></div>
-    <div class="footer-version">v2.4.1 · ASTRAEUS</div>
+    <div class="footer-ver">v2.4.1 · ASTRAEUS</div>
   </div>
 
 </nav>
 
 <style>
   .sidebar {
-    width: 210px; min-width: 210px; height: 100%;
+    width: 214px; min-width: 214px; height: 100%;
     background: var(--sidebar-bg);
     border-right: 1px solid var(--border-dim);
     display: flex; flex-direction: column;
-    padding: 0;
-    transition: background 0.4s;
+    transition: background 0.5s;
+    position: relative; z-index: 20;
   }
 
   .logo {
-    display: flex; align-items: center; gap: 10px;
-    padding: 20px 18px 18px;
+    display: flex; align-items: center; gap: 12px;
+    padding: 18px 16px;
     border-bottom: 1px solid var(--border-dim);
   }
 
-  .logo-sigil { flex-shrink: 0; }
+  .sigil { flex-shrink: 0; }
 
   .logo-text { display: flex; flex-direction: column; gap: 2px; }
 
   .logo-name {
-    font-family: 'Limelight', cursive;
-    font-size: 15px; color: var(--gold);
-    letter-spacing: 0.12em;
-    line-height: 1;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px; font-weight: 800;
+    color: var(--gold); letter-spacing: 0.1em; line-height: 1;
   }
 
   .logo-sub {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 7px; color: var(--text-dim);
-    letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 7.5px; color: var(--text-dim);
+    letter-spacing: 0.1em;
   }
 
-  .sys-status {
+  .sys-pill {
     display: flex; align-items: center; gap: 8px;
-    padding: 10px 18px;
+    padding: 9px 16px;
     border-bottom: 1px solid var(--border-dim);
   }
 
-  .pulse-dot {
+  .sys-dot {
     width: 7px; height: 7px; border-radius: 50%;
-    background: var(--safe);
-    animation: pulse 2s ease-in-out infinite;
-    flex-shrink: 0;
+    background: var(--safe); flex-shrink: 0;
+    animation: pulse 2.5s ease-in-out infinite;
   }
 
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.85)} }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
 
-  .sys-text {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--safe);
-    letter-spacing: 0.14em; text-transform: uppercase;
+  .sys-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px; font-weight: 600;
+    color: var(--safe); letter-spacing: 0.06em;
   }
 
-  .nav-section-label {
+  .nav-label-sec {
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px; color: var(--text-dim);
-    letter-spacing: 0.2em; text-transform: uppercase;
-    padding: 14px 18px 6px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    padding: 14px 16px 6px;
   }
 
   .nav-list {
     list-style: none; flex: 1;
     display: flex; flex-direction: column;
-    gap: 2px; padding: 4px 10px;
+    gap: 2px; padding: 4px 8px;
   }
 
-  .nav-btn {
-    width: 100%;
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 10px;
+  .nav-item {
+    width: 100%; display: flex; align-items: center; gap: 10px;
+    padding: 11px 10px;
     background: none; border: none; cursor: pointer;
-    color: var(--text-dim);
-    text-align: left; transition: all 0.2s;
-    position: relative;
-    border-radius: 4px;
+    color: var(--text-dim); text-align: left;
+    transition: color 0.2s, background 0.2s;
+    position: relative; border-radius: 6px;
   }
 
-  .nav-btn:hover {
-    color: var(--accent-hi);
+  .nav-item:hover {
+    color: var(--text-mid);
     background: var(--glass);
   }
 
-  .nav-btn.active {
+  .nav-item.active {
     color: var(--gold);
-    background: rgba(232,184,75,0.07);
+    background: rgba(240,192,64,0.06);
   }
 
-  .nav-icon {
-    font-size: 15px; width: 20px;
-    text-align: center; flex-shrink: 0;
+  .nav-ico {
+    font-size: 16px; width: 22px; text-align: center; flex-shrink: 0;
+    transition: transform 0.2s;
   }
 
-  .nav-text {
-    display: flex; flex-direction: column; gap: 1px;
-    flex: 1;
-  }
+  .nav-item:hover .nav-ico { transform: scale(1.1); }
+  .nav-item.active .nav-ico { color: var(--gold); }
 
-  .nav-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px; font-weight: 500;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    line-height: 1;
+  .nav-txt { display: flex; flex-direction: column; gap: 1px; flex: 1; }
+
+  .nav-lbl {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 0.04em; line-height: 1;
+    text-transform: uppercase;
   }
 
   .nav-sub {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 9px; opacity: 0.5;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; opacity: 0.5; line-height: 1;
+  }
+
+  .nav-arrow {
+    font-size: 18px; color: var(--text-dim);
+    opacity: 0; transform: translateX(-4px);
+    transition: opacity 0.2s, transform 0.2s;
     line-height: 1;
   }
-
-  .active-bar {
-    position: absolute; left: 0; top: 20%; bottom: 20%;
-    width: 2px; background: var(--gold);
-    border-radius: 0 2px 2px 0;
+  .nav-arrow.visible {
+    opacity: 1; color: var(--gold); transform: translateX(0);
   }
+  .nav-item:hover .nav-arrow { opacity: 0.4; transform: translateX(0); }
+
+  .active-line {
+    position: absolute; left: 0; top: 18%; bottom: 18%;
+    width: 2.5px; background: var(--gold);
+    border-radius: 0 2px 2px 0;
+    animation: linein 0.25s ease-out;
+  }
+  @keyframes linein { from{height:0;opacity:0} to{opacity:1} }
 
   .badge {
-    background: var(--danger);
-    color: white;
+    background: var(--danger); color: white;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; padding: 1px 6px;
-    border-radius: 10px;
+    font-size: 9px; padding: 1px 6px; border-radius: 10px;
+    animation: pulse 1s infinite;
   }
 
-  .sidebar-footer {
-    padding: 14px 18px;
+  .footer {
+    padding: 14px 16px;
     border-top: 1px solid var(--border-dim);
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 10px;
   }
 
-  .footer-row {
-    display: flex; justify-content: space-between; align-items: center;
+  .footer-stats {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .fstat {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px; flex: 1;
+  }
+
+  .fval {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px; font-weight: 800;
+    color: var(--accent-hi); line-height: 1;
   }
 
   .fkey {
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px; color: var(--text-dim);
-    letter-spacing: 0.15em; text-transform: uppercase;
+    letter-spacing: 0.12em; text-transform: uppercase;
   }
 
-  .fval {
-    font-family: 'Limelight', cursive;
-    font-size: 14px; color: var(--accent-hi);
-  }
+  .fstat-div { width: 1px; height: 28px; background: var(--border-dim); }
 
-  .fval.danger { color: var(--danger); }
-  .fval.safe   { color: var(--safe); }
-
-  .footer-divider {
-    height: 1px; background: var(--border-dim); margin: 2px 0;
-  }
-
-  .footer-version {
+  .footer-ver {
     font-family: 'JetBrains Mono', monospace;
     font-size: 8px; color: var(--text-dim);
     letter-spacing: 0.1em; text-align: center;

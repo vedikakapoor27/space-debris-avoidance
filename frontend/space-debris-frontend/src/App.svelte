@@ -1,5 +1,7 @@
 <script>
   import { onMount } from 'svelte'
+  import { fly, fade } from 'svelte/transition'
+  import { cubicOut } from 'svelte/easing'
   import Sidebar from './components/Sidebar.svelte'
   import Globe3D from './components/Globe3D.svelte'
   import DashboardPanel from './components/DashboardPanel.svelte'
@@ -10,6 +12,9 @@
   import { checkHealth } from './utils/api.js'
 
   let clockStr = '--:--:--'
+  let prevPanel = 'dashboard'
+
+  $: if ($activePanel !== prevPanel) { prevPanel = $activePanel }
 
   onMount(async () => {
     const tick = () => {
@@ -18,161 +23,179 @@
     }
     tick()
     const id = setInterval(tick, 1000)
-
-    try {
-      await checkHealth()
-      backendOnline.set(true)
-    } catch {
-      backendOnline.set(false)
-    }
-
+    try { await checkHealth(); backendOnline.set(true) }
+    catch { backendOnline.set(false) }
     return () => clearInterval(id)
   })
 
   function toggleTheme() {
-    theme.update(t => t === 'dark' ? 'void' : 'dark')
+    theme.update(t => t === 'dark' ? 'midnight' : 'dark')
+  }
+
+  const panelLabels = {
+    dashboard:    'Mission Overview',
+    predict:      'Risk Analysis',
+    conjunctions: 'Conjunction Events',
+    telemetry:    'Live Telemetry'
   }
 </script>
 
 <div class="app" data-theme={$theme}>
-  <div class="noise" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
   <Sidebar />
 
   <div class="main">
+
     <header class="topbar">
       <div class="topbar-left">
-        <span class="tb-label">UTC</span>
-        <span class="tb-time">{clockStr}</span>
-        <span class="tb-sep">·</span>
-        <span class="tb-mission">ASTRAEUS — SPACE DEBRIS SENTINEL</span>
+        <div class="time-block">
+          <span class="time-label">UTC</span>
+          <span class="time-val">{clockStr}</span>
+        </div>
+        <div class="divider-v"></div>
+        <span class="mission-name">ASTRAEUS · SPACE DEBRIS SENTINEL</span>
+      </div>
+
+      <div class="topbar-center">
+        <span class="panel-crumb">
+          {panelLabels[$activePanel] ?? ''}
+        </span>
       </div>
 
       <div class="topbar-right">
-        <button class="theme-toggle" on:click={toggleTheme} title="Toggle theme">
-          {$theme === 'dark' ? '◑ VOID' : '◑ DARK'}
+        <button class="theme-btn" on:click={toggleTheme}>
+          <span class="theme-icon">{$theme === 'dark' ? '◐' : '◑'}</span>
+          {$theme === 'dark' ? 'MIDNIGHT' : 'DARK'}
         </button>
 
-        <span class="backend-status" class:online={$backendOnline}>
-          <span class="bdot"></span>
+        <div class="status-pill" class:online={$backendOnline}>
+          <span class="status-dot"></span>
           {$backendOnline ? 'BACKEND ONLINE' : 'BACKEND OFFLINE'}
-        </span>
+        </div>
 
-        <button
-          class="globe-toggle"
-          on:click={() => globeRotating.update(v => !v)}
-        >
-          {$globeRotating ? '⏸ PAUSE' : '▶ RESUME'}
+        <button class="ctrl-btn" on:click={() => globeRotating.update(v => !v)}>
+          {$globeRotating ? '⏸' : '▶'}
         </button>
       </div>
     </header>
 
     <div class="body">
+
       <div class="globe-pane">
         <Globe3D />
 
-        <div class="globe-stats">
-          <div class="gs-item">
-            <span class="gs-val">847</span>
-            <span class="gs-key">OBJECTS</span>
-          </div>
-          <div class="gs-divider"></div>
-          <div class="gs-item">
-            <span class="gs-val danger">2</span>
-            <span class="gs-key">HIGH RISK</span>
-          </div>
-          <div class="gs-divider"></div>
-          <div class="gs-item">
-            <span class="gs-val warn">3</span>
-            <span class="gs-key">MEDIUM</span>
-          </div>
+        <div class="globe-hud-tl">
+          <div class="hud-val">{847}</div>
+          <div class="hud-key">OBJECTS</div>
+        </div>
+        <div class="globe-hud-tr">
+          <div class="hud-val danger">2</div>
+          <div class="hud-key">CRITICAL</div>
         </div>
 
         <div class="globe-legend">
-          <div class="leg-item"><span class="leg-dot" style="background:#ff3860"></span>CRITICAL</div>
-          <div class="leg-item"><span class="leg-dot" style="background:#ff9020"></span>WARNING</div>
-          <div class="leg-item"><span class="leg-dot" style="background:#00e8a0"></span>NOMINAL</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#ff3860"></span>CRITICAL</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#ff9020"></span>WARNING</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#00e8a0"></span>NOMINAL</div>
         </div>
       </div>
 
-      <div class="right-panel">
-        {#if $activePanel === 'dashboard'}
-          <DashboardPanel />
-        {:else if $activePanel === 'predict'}
-          <PredictPanel />
-        {:else if $activePanel === 'conjunctions'}
-          <ConjunctionsPanel />
-        {:else if $activePanel === 'telemetry'}
-          <TelemetryPanel />
-        {/if}
+      <div class="right-pane">
+        {#key $activePanel}
+          <div
+            class="panel-wrap"
+            in:fly={{ x: 24, duration: 320, easing: cubicOut, delay: 60 }}
+            out:fade={{ duration: 120 }}
+          >
+            {#if $activePanel === 'dashboard'}
+              <DashboardPanel />
+            {:else if $activePanel === 'predict'}
+              <PredictPanel />
+            {:else if $activePanel === 'conjunctions'}
+              <ConjunctionsPanel />
+            {:else if $activePanel === 'telemetry'}
+              <TelemetryPanel />
+            {/if}
+          </div>
+        {/key}
       </div>
+
     </div>
   </div>
 </div>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Limelight&family=JetBrains+Mono:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+  /* ── FONTS ── */
+  :global(@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap'));
 
-  /* ── DARK THEME (default) ── */
+  /* ══════════════════════════════════════
+     DARK THEME  —  deep void purple
+  ══════════════════════════════════════ */
   :global([data-theme="dark"]) {
-    --bg:          #05020f;
-    --bg2:         #0a0520;
-    --surface:     #0f0a24;
-    --glass:       rgba(120,60,255,0.04);
-    --border:      rgba(140,80,255,0.16);
-    --border-dim:  rgba(140,80,255,0.07);
+    --bg:           #07041a;
+    --bg2:          #0b0726;
+    --surface:      #0f0b2e;
+    --glass:        rgba(110,50,255,0.05);
+    --border:       rgba(130,70,255,0.18);
+    --border-dim:   rgba(130,70,255,0.08);
 
-    --accent:      #8b5cf6;
-    --accent-hi:   #a78bfa;
-    --gold:        #e8b84b;
-    --gold-dim:    rgba(232,184,75,0.55);
-    --violet:      #c084fc;
-    --text:        #ede9fe;
-    --text-dim:    rgba(196,181,253,0.45);
+    --accent:       #7c3aed;
+    --accent-hi:    #a78bfa;
+    --accent-glow:  0 0 28px rgba(124,58,237,0.35);
+    --gold:         #f0c040;
+    --gold-dim:     rgba(240,192,64,0.5);
+    --violet:       #c084fc;
+    --text:         #ede9fe;
+    --text-dim:     rgba(196,181,253,0.42);
+    --text-mid:     rgba(220,210,255,0.7);
 
-    --danger:      #ff3860;
-    --warning:     #ff9020;
-    --safe:        #00e8a0;
+    --danger:       #ff3860;
+    --warning:      #ff9020;
+    --safe:         #00e8a0;
 
-    --sidebar-bg:  #06031a;
-    --panel-bg:    #07041a;
-    --topbar-bg:   rgba(5,2,15,0.97);
+    --sidebar-bg:   #050315;
+    --panel-bg:     #07041a;
+    --topbar-bg:    rgba(5,3,20,0.97);
+    --hud-bg:       rgba(5,3,20,0.82);
 
-    --glow-accent: 0 0 24px rgba(139,92,246,0.3);
-    --glow-gold:   0 0 20px rgba(232,184,75,0.3);
-    --glow-danger: 0 0 20px rgba(255,56,96,0.35);
+    --globe-bg:     radial-gradient(ellipse at 50% 55%, #110535 0%, #07041a 100%);
   }
 
-  /* ── VOID WHITE THEME ── */
-  :global([data-theme="void"]) {
-    --bg:          #f8f8f0;
-    --bg2:         #f0eee8;
-    --surface:     #ffffff;
-    --glass:       rgba(0,0,0,0.03);
-    --border:      rgba(0,0,0,0.1);
-    --border-dim:  rgba(0,0,0,0.06);
+  /* ══════════════════════════════════════
+     MIDNIGHT THEME  —  deep blue + ice + gold
+  ══════════════════════════════════════ */
+  :global([data-theme="midnight"]) {
+    --bg:           #0d1117;
+    --bg2:          #0a0f1a;
+    --surface:      #111827;
+    --glass:        rgba(30,100,200,0.06);
+    --border:       rgba(80,160,255,0.18);
+    --border-dim:   rgba(80,160,255,0.08);
 
-    --accent:      #7c3fff;
-    --accent-hi:   #5b21b6;
-    --gold:        #b8860b;
-    --gold-dim:    rgba(184,134,11,0.6);
-    --violet:      #6d28d9;
-    --text:        #0a0a0a;
-    --text-dim:    rgba(10,10,10,0.45);
+    --accent:       #2563eb;
+    --accent-hi:    #93c5fd;
+    --accent-glow:  0 0 28px rgba(37,99,235,0.35);
+    --gold:         #f59e0b;
+    --gold-dim:     rgba(245,158,11,0.5);
+    --violet:       #60a5fa;
+    --text:         #e0f2fe;
+    --text-dim:     rgba(147,197,253,0.45);
+    --text-mid:     rgba(186,230,253,0.75);
 
-    --danger:      #dc2626;
-    --warning:     #d97706;
-    --safe:        #059669;
+    --danger:       #f43f5e;
+    --warning:      #f97316;
+    --safe:         #10b981;
 
-    --sidebar-bg:  #0a0a0a;
-    --panel-bg:    #ffffff;
-    --topbar-bg:   rgba(10,10,10,0.98);
+    --sidebar-bg:   #080d14;
+    --panel-bg:     #0d1117;
+    --topbar-bg:    rgba(8,13,20,0.98);
+    --hud-bg:       rgba(8,13,20,0.85);
 
-    --glow-accent: none;
-    --glow-gold:   none;
-    --glow-danger: none;
+    --globe-bg:     radial-gradient(ellipse at 50% 55%, #0a1f3d 0%, #0d1117 100%);
   }
 
+  /* ── GLOBAL RESET ── */
   :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
 
   :global(body) {
@@ -180,184 +203,186 @@
     color: var(--text);
     overflow: hidden;
     height: 100vh;
-    font-family: 'Space Grotesk', sans-serif;
-    transition: background 0.4s, color 0.4s;
+    font-family: 'Syne', sans-serif;
+    transition: background 0.5s, color 0.5s;
   }
 
   :global(#app) { height: 100vh; width: 100vw; }
 
   :global(::-webkit-scrollbar) { width: 3px; }
-  :global(::-webkit-scrollbar-thumb) { background: var(--border); }
+  :global(::-webkit-scrollbar-thumb) { background: var(--border); border-radius: 2px; }
 
+  /* grain texture */
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 900;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  }
+
+  /* ── LAYOUT ── */
   .app {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    position: relative;
-    overflow: hidden;
-    background: var(--bg);
-    transition: background 0.4s;
+    display: flex; height: 100vh; width: 100vw;
+    overflow: hidden; background: var(--bg);
+    transition: background 0.5s;
   }
 
-  /* subtle noise texture overlay */
-  .noise {
-    position: fixed; inset: 0;
-    opacity: 0.025;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 999;
-  }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; }
 
-  [data-theme="dark"] .noise { opacity: 0.04; }
-
-  .main {
-    flex: 1; display: flex;
-    flex-direction: column;
-    min-width: 0; height: 100vh;
-  }
-
+  /* ── TOPBAR ── */
   .topbar {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    padding: 0 24px; height: 46px; min-height: 46px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px; height: 48px; min-height: 48px;
     background: var(--topbar-bg);
     border-bottom: 1px solid var(--border-dim);
-    backdrop-filter: blur(20px);
-    z-index: 10;
+    backdrop-filter: blur(24px);
+    z-index: 10; position: relative;
   }
 
-  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-left { display: flex; align-items: center; gap: 14px; }
 
-  .tb-label {
+  .time-block { display: flex; align-items: baseline; gap: 6px; }
+
+  .time-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim);
-    letter-spacing: 0.2em; text-transform: uppercase;
+    font-size: 9px; color: var(--text-dim); letter-spacing: 0.2em;
   }
 
-  .tb-time {
-    font-family: 'Limelight', cursive;
-    font-size: 14px; color: var(--gold);
-    letter-spacing: 0.06em;
-  }
-
-  .tb-sep { color: var(--border); font-size: 12px; }
-
-  .tb-mission {
+  .time-val {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim);
-    letter-spacing: 0.18em; text-transform: uppercase;
+    font-size: 15px; color: var(--gold); letter-spacing: 0.06em;
+    font-weight: 500;
   }
 
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .divider-v { width: 1px; height: 22px; background: var(--border-dim); }
 
-  .theme-toggle {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; letter-spacing: 0.12em;
-    color: var(--violet); background: transparent;
-    border: 1px solid var(--border);
-    padding: 4px 12px; cursor: pointer;
-    transition: all 0.2s;
+  .mission-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px; font-weight: 700;
+    color: var(--text-dim); letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
-  .theme-toggle:hover { background: var(--glass); border-color: var(--accent); }
 
-  .backend-status {
+  .topbar-center {
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+
+  .panel-crumb {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px; font-weight: 600;
+    color: var(--text-mid); letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+  .theme-btn {
     display: flex; align-items: center; gap: 6px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; letter-spacing: 0.1em;
-    color: var(--danger);
+    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
+    color: var(--violet); background: transparent;
+    border: 1px solid var(--border-dim);
+    padding: 5px 12px; cursor: pointer;
+    transition: all 0.25s; text-transform: uppercase;
   }
-  .backend-status.online { color: var(--safe); }
+  .theme-btn:hover { border-color: var(--accent); background: var(--glass); color: var(--accent-hi); }
+  .theme-icon { font-size: 11px; }
 
-  .bdot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--danger);
-    animation: bdot 1.5s ease-in-out infinite;
-  }
-  .backend-status.online .bdot { background: var(--safe); }
-  @keyframes bdot { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-  .globe-toggle {
+  .status-pill {
+    display: flex; align-items: center; gap: 7px;
     font-family: 'JetBrains Mono', monospace;
     font-size: 9px; letter-spacing: 0.12em;
-    color: var(--accent-hi); background: transparent;
-    border: 1px solid var(--border);
-    padding: 4px 12px; cursor: pointer;
-    transition: all 0.2s;
+    color: var(--danger); padding: 5px 12px;
+    border: 1px solid rgba(255,56,96,0.2);
+    transition: all 0.3s;
   }
-  .globe-toggle:hover { background: var(--glass); border-color: var(--accent); }
+  .status-pill.online { color: var(--safe); border-color: rgba(0,232,160,0.2); }
 
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--danger);
+    animation: blink 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  .status-pill.online .status-dot { background: var(--safe); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+  .ctrl-btn {
+    width: 32px; height: 32px;
+    background: var(--glass); border: 1px solid var(--border-dim);
+    color: var(--text-dim); font-size: 12px; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  }
+  .ctrl-btn:hover { border-color: var(--border); color: var(--text); }
+
+  /* ── BODY ── */
   .body {
     flex: 1; display: grid;
     grid-template-columns: 440px 1fr;
     min-height: 0; overflow: hidden;
   }
 
+  /* ── GLOBE PANE ── */
   .globe-pane {
-    position: relative;
-    background: var(--sidebar-bg);
+    position: relative; overflow: hidden;
+    background: var(--globe-bg);
     border-right: 1px solid var(--border-dim);
-    overflow: hidden;
+    transition: background 0.5s;
   }
 
-  [data-theme="dark"] .globe-pane {
-    background: radial-gradient(ellipse at 50% 60%, #0e0530 0%, #05020f 100%);
-  }
-
-  .globe-stats {
+  .globe-hud-tl {
     position: absolute; top: 14px; left: 14px;
-    display: flex; align-items: center;
-    background: rgba(5,2,15,0.85);
+    background: var(--hud-bg);
     border: 1px solid var(--border);
-    backdrop-filter: blur(14px);
-    overflow: hidden;
+    padding: 10px 16px; backdrop-filter: blur(14px);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
 
-  [data-theme="void"] .globe-stats {
-    background: rgba(255,255,255,0.92);
-    border-color: rgba(0,0,0,0.12);
+  .globe-hud-tr {
+    position: absolute; top: 14px; right: 14px;
+    background: var(--hud-bg);
+    border: 1px solid rgba(255,56,96,0.25);
+    padding: 10px 16px; backdrop-filter: blur(14px);
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
   }
 
-  .gs-item {
-    padding: 8px 16px;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 3px;
+  .hud-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--gold); line-height: 1;
   }
-  .gs-val {
-    font-family: 'Limelight', cursive;
-    font-size: 15px; color: var(--gold);
-  }
-  .gs-val.danger { color: var(--danger); }
-  .gs-val.warn   { color: var(--warning); }
-  .gs-key {
+  .hud-val.danger { color: var(--danger); }
+
+  .hud-key {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 7px; color: var(--text-dim);
-    letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 8px; color: var(--text-dim);
+    letter-spacing: 0.15em; text-transform: uppercase;
   }
-  .gs-divider { width: 1px; height: 32px; background: var(--border-dim); }
 
   .globe-legend {
     position: absolute; bottom: 14px; right: 14px;
-    display: flex; flex-direction: column; gap: 7px;
-    background: rgba(5,2,15,0.8);
+    background: var(--hud-bg);
     border: 1px solid var(--border-dim);
-    padding: 10px 14px; backdrop-filter: blur(10px);
+    padding: 10px 14px; backdrop-filter: blur(12px);
+    display: flex; flex-direction: column; gap: 8px;
   }
 
-  [data-theme="void"] .globe-legend {
-    background: rgba(255,255,255,0.92);
-    border-color: rgba(0,0,0,0.1);
-  }
-
-  .leg-item {
+  .leg-row {
     display: flex; align-items: center; gap: 8px;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim);
-    letter-spacing: 0.1em;
+    font-size: 9px; color: var(--text-dim); letter-spacing: 0.12em;
   }
-  .leg-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-  .right-panel {
-    display: flex; flex-direction: column;
-    overflow: hidden; background: var(--panel-bg);
-    transition: background 0.4s;
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── RIGHT PANE ── */
+  .right-pane {
+    position: relative; overflow: hidden;
+    background: var(--panel-bg);
+    transition: background 0.5s;
+  }
+
+  .panel-wrap {
+    position: absolute; inset: 0;
+    overflow-y: auto; overflow-x: hidden;
   }
 </style>
