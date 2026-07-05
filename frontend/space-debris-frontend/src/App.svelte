@@ -8,14 +8,13 @@
   import PredictPanel from './components/PredictPanel.svelte'
   import ConjunctionsPanel from './components/ConjunctionsPanel.svelte'
   import TelemetryPanel from './components/TelemetryPanel.svelte'
-  import { activePanel, backendOnline, globeRotating, theme } from './stores/appStore.js'
-  import { checkHealth } from './utils/api.js'
   import HistoryPanel from './components/HistoryPanel.svelte'
+  import { activePanel, backendOnline, globeRotating } from './stores/appStore.js'
+  import { checkHealth } from './utils/api.js'
 
   let clockStr = '--:--:--'
-  let prevPanel = 'dashboard'
-
-  $: if ($activePanel !== prevPanel) { prevPanel = $activePanel }
+  let cursorX = 0, cursorY = 0
+  let cursorHover = false
 
   onMount(async () => {
     const tick = () => {
@@ -24,30 +23,46 @@
     }
     tick()
     const id = setInterval(tick, 1000)
+
     try { await checkHealth(); backendOnline.set(true) }
     catch { backendOnline.set(false) }
-    return () => clearInterval(id)
+
+    const move = (e) => { cursorX = e.clientX; cursorY = e.clientY }
+    const over = (e) => { cursorHover = !!e.target.closest('button, a, .hoverable') }
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseover', over)
+
+    return () => {
+      clearInterval(id)
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseover', over)
+    }
   })
 
-  function toggleTheme() {
-    theme.update(t => t === 'dark' ? 'midnight' : 'dark')
-  }
-
   const panelLabels = {
-    dashboard:    'Mission Overview',
+    dashboard:    'Dashboard',
     predict:      'Risk Analysis',
-    conjunctions: 'Conjunction Events',
-    telemetry:    'Live Telemetry'
+    conjunctions: 'Conjunctions',
+    telemetry:    'Telemetry',
+    history:      'History'
   }
 </script>
 
-<div class="app" data-theme={$theme}>
-  <div class="grain" aria-hidden="true"></div>
+<!-- Custom cursor -->
+<div
+  class="cursor"
+  class:cursor-hover={cursorHover}
+  style="left:{cursorX}px; top:{cursorY}px"
+></div>
+<div
+  class="cursor-dot"
+  style="left:{cursorX}px; top:{cursorY}px"
+></div>
 
+<div class="app">
   <Sidebar />
 
   <div class="main">
-
     <header class="topbar">
       <div class="topbar-left">
         <div class="time-block">
@@ -55,50 +70,40 @@
           <span class="time-val">{clockStr}</span>
         </div>
         <div class="divider-v"></div>
-        <span class="mission-name">ASTRAEUS · SPACE DEBRIS SENTINEL</span>
+        <span class="mission-label">ASTRAEUS — SPACE DEBRIS SENTINEL</span>
       </div>
 
       <div class="topbar-center">
-        <span class="panel-crumb">
+        <span class="breadcrumb">
           {panelLabels[$activePanel] ?? ''}
         </span>
       </div>
 
       <div class="topbar-right">
-        <button class="theme-btn" on:click={toggleTheme}>
-          <span class="theme-icon">{$theme === 'dark' ? '◐' : '◑'}</span>
-          {$theme === 'dark' ? 'MIDNIGHT' : 'DARK'}
-        </button>
-
-        <div class="status-pill" class:online={$backendOnline}>
+        <div class="status-indicator" class:online={$backendOnline}>
           <span class="status-dot"></span>
-          {$backendOnline ? 'BACKEND ONLINE' : 'BACKEND OFFLINE'}
+          <span>{$backendOnline ? 'Backend Online' : 'Backend Offline'}</span>
         </div>
-
-        <button class="ctrl-btn" on:click={() => globeRotating.update(v => !v)}>
-          {$globeRotating ? '⏸' : '▶'}
+        <button class="live-btn hoverable" on:click={() => globeRotating.update(v => !v)}>
+          <span class="live-dot"></span>
+          {$globeRotating ? 'Live' : 'Paused'}
         </button>
+        <div class="avatar hoverable">SD</div>
       </div>
     </header>
 
     <div class="body">
-
       <div class="globe-pane">
         <Globe3D />
-
-        <div class="globe-hud-tl">
-          <div class="hud-val">{847}</div>
-          <div class="hud-key">OBJECTS</div>
+        <div class="globe-overlay-tl">
+          <div class="ov-title">LIVE ORBITAL TRACKING</div>
+          <div class="ov-sub">Drag to rotate · Scroll to zoom</div>
         </div>
-        <div class="globe-hud-tr">
-          <div class="hud-val danger">2</div>
-          <div class="hud-key">CRITICAL</div>
-        </div>
-
         <div class="globe-legend">
-          <div class="leg-row"><span class="leg-dot" style="background:#ff3860"></span>CRITICAL</div>
-          <div class="leg-row"><span class="leg-dot" style="background:#ff9020"></span>WARNING</div>
-          <div class="leg-row"><span class="leg-dot" style="background:#00e8a0"></span>NOMINAL</div>
+          <div class="leg-item"><span class="leg-dot" style="background:#3b82f6"></span>Active Satellite</div>
+          <div class="leg-item"><span class="leg-dot" style="background:#94a3b8"></span>Debris</div>
+          <div class="leg-item"><span class="leg-dot" style="background:#ef4444"></span>Critical</div>
+          <div class="leg-item"><span class="leg-dot" style="background:#f59e0b"></span>Warning</div>
         </div>
       </div>
 
@@ -106,8 +111,8 @@
         {#key $activePanel}
           <div
             class="panel-wrap"
-            in:fly={{ x: 24, duration: 320, easing: cubicOut, delay: 60 }}
-            out:fade={{ duration: 120 }}
+            in:fly={{ x: 16, duration: 280, easing: cubicOut, delay: 40 }}
+            out:fade={{ duration: 100 }}
           >
             {#if $activePanel === 'dashboard'}
               <DashboardPanel />
@@ -117,257 +122,220 @@
               <ConjunctionsPanel />
             {:else if $activePanel === 'telemetry'}
               <TelemetryPanel />
+            {:else if $activePanel === 'history'}
+              <HistoryPanel />
             {/if}
           </div>
         {/key}
       </div>
-
     </div>
   </div>
 </div>
 
 <style>
-
-  /* ══════════════════════════════════════
-     DARK THEME  —  deep void purple
-  ══════════════════════════════════════ */
-  :global([data-theme="dark"]) {
-    --bg:           #07041a;
-    --bg2:          #0b0726;
-    --surface:      #0f0b2e;
-    --glass:        rgba(110,50,255,0.05);
-    --border:       rgba(130,70,255,0.18);
-    --border-dim:   rgba(130,70,255,0.08);
-
-    --accent:       #7c3aed;
-    --accent-hi:    #a78bfa;
-    --accent-glow:  0 0 28px rgba(124,58,237,0.35);
-    --gold:         #e2e8f0;
-    --gold-dim:     rgba(240,192,64,0.5);
-    --violet:       #c084fc;
-    --text:         #ede9fe;
-    --text-dim:     rgba(196,181,253,0.42);
-    --text-mid:     rgba(220,210,255,0.7);
-
-    --danger:       #ff3860;
-    --warning:      #ff9020;
-    --safe:         #00e8a0;
-
-    --sidebar-bg:   #050315;
-    --panel-bg:     #07041a;
-    --topbar-bg:    rgba(5,3,20,0.97);
-    --hud-bg:       rgba(5,3,20,0.82);
-
-    --globe-bg:     radial-gradient(ellipse at 50% 55%, #110535 0%, #07041a 100%);
-  }
-
-  /* ══════════════════════════════════════
-     MIDNIGHT THEME  —  deep blue + ice + gold
-  ══════════════════════════════════════ */
-  :global([data-theme="midnight"]) {
-    --bg:           #0d1117;
-    --bg2:          #0a0f1a;
-    --surface:      #111827;
-    --glass:        rgba(30,100,200,0.06);
-    --border:       rgba(80,160,255,0.18);
-    --border-dim:   rgba(80,160,255,0.08);
-
-    --accent:       #2563eb;
-    --accent-hi:    #93c5fd;
-    --accent-glow:  0 0 28px rgba(37,99,235,0.35);
-    --gold:         #e2e8f0;
-    --gold-dim:     rgba(245,158,11,0.5);
-    --violet:       #60a5fa;
-    --text:         #e0f2fe;
-    --text-dim:     rgba(147,197,253,0.45);
-    --text-mid:     rgba(186,230,253,0.75);
-
-    --danger:       #f43f5e;
-    --warning:      #f97316;
-    --safe:         #10b981;
-
-    --sidebar-bg:   #080d14;
-    --panel-bg:     #0d1117;
-    --topbar-bg:    rgba(8,13,20,0.98);
-    --hud-bg:       rgba(8,13,20,0.85);
-
-    --globe-bg:     radial-gradient(ellipse at 50% 55%, #0a1f3d 0%, #0d1117 100%);
-  }
-
-  /* ── GLOBAL RESET ── */
+  /* ── GLOBAL ── */
   :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :global(:root) {
+    --bg:        #0f172a;
+    --bg2:       #111827;
+    --surface:   #1e293b;
+    --card:      #1f2937;
+    --card2:     #243447;
+    --border:    rgba(255,255,255,0.07);
+    --border2:   rgba(255,255,255,0.12);
+
+    --blue:      #3b82f6;
+    --blue-dark: #2563eb;
+    --success:   #10b981;
+    --warning:   #f59e0b;
+    --danger:    #ef4444;
+
+    --text:      #f8fafc;
+    --text-2:    #cbd5e1;
+    --text-3:    #94a3b8;
+    --text-4:    #64748b;
+
+    --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
+    --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.3);
+
+    --radius:    8px;
+    --radius-lg: 12px;
+  }
 
   :global(body) {
     background: var(--bg);
     color: var(--text);
-    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
     height: 100vh;
-    font-family: 'Syne', sans-serif;
-    transition: background 0.5s, color 0.5s;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   :global(#app) { height: 100vh; width: 100vw; }
 
-  :global(::-webkit-scrollbar) { width: 3px; }
-  :global(::-webkit-scrollbar-thumb) { background: var(--border); border-radius: 2px; }
+  :global(::-webkit-scrollbar) { width: 4px; }
+  :global(::-webkit-scrollbar-track) { background: transparent; }
+  :global(::-webkit-scrollbar-thumb) { background: var(--border2); border-radius: 2px; }
 
-  /* grain texture */
-  .grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 900;
-    opacity: 0.035;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 28px; height: 28px;
+    border: 1.5px solid rgba(255,255,255,0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .cursor.cursor-hover {
+    width: 36px; height: 36px;
+    border-color: var(--blue);
+    background: rgba(59,130,246,0.08);
+  }
+  .cursor-dot {
+    position: fixed; pointer-events: none; z-index: 9999;
+    width: 4px; height: 4px;
+    background: white; border-radius: 50%;
+    transform: translate(-50%, -50%);
   }
 
   /* ── LAYOUT ── */
   .app {
-    display: flex; height: 100vh; width: 100vw;
-    overflow: hidden; background: var(--bg);
-    transition: background 0.5s;
+    display: flex; height: 100vh; width: 100vw; overflow: hidden;
+    background: var(--bg);
   }
 
-  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; }
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 
   /* ── TOPBAR ── */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 0 24px; height: 48px; min-height: 48px;
-    background: var(--topbar-bg);
-    border-bottom: 1px solid var(--border-dim);
-    backdrop-filter: blur(24px);
-    z-index: 10; position: relative;
+    padding: 0 20px; height: 52px; min-height: 52px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
   }
 
-  .topbar-left { display: flex; align-items: center; gap: 14px; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
 
   .time-block { display: flex; align-items: baseline; gap: 6px; }
 
   .time-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim); letter-spacing: 0.2em;
+    font-size: 10px; font-weight: 500; color: var(--text-3);
+    letter-spacing: 0.1em; text-transform: uppercase;
   }
+
   .time-val {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;   color: #e2e8f0; letter-spacing: 0.06em;
-    font-weight: 500;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 16px; font-weight: 600; color: var(--text);
+    letter-spacing: 0.04em;
   }
 
-  .divider-v { width: 1px; height: 22px; background: var(--border-dim); }
+  .divider-v { width: 1px; height: 18px; background: var(--border2); }
 
-  .mission-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    color: var(--text-dim); letter-spacing: 0.18em;
-    text-transform: uppercase;
+  .mission-label {
+    font-size: 11px; font-weight: 500; color: var(--text-3);
+    letter-spacing: 0.08em; text-transform: uppercase;
   }
 
   .topbar-center {
     position: absolute; left: 50%; transform: translateX(-50%);
   }
 
-  .panel-crumb {
-    font-family: 'Syne', sans-serif;
-    font-size: 12px; font-weight: 600;
-    color: var(--text-mid); letter-spacing: 0.12em;
-    text-transform: uppercase;
+  .breadcrumb {
+    font-size: 13px; font-weight: 600; color: var(--text-2);
+    letter-spacing: 0.04em;
   }
 
   .topbar-right { display: flex; align-items: center; gap: 10px; }
 
-  .theme-btn {
+  .status-indicator {
     display: flex; align-items: center; gap: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; font-weight: 500; letter-spacing: 0.14em;
-    color: var(--violet); background: transparent;
-    border: 1px solid var(--border-dim);
-    padding: 5px 12px; cursor: pointer;
-    transition: all 0.25s; text-transform: uppercase;
+    font-size: 12px; font-weight: 500; color: var(--danger);
+    padding: 5px 12px;
+    background: rgba(239,68,68,0.08);
+    border: 1px solid rgba(239,68,68,0.2);
+    border-radius: 20px;
   }
-  .theme-btn:hover { border-color: var(--accent); background: var(--glass); color: var(--accent-hi); }
-  .theme-icon { font-size: 11px; }
-
-  .status-pill {
-    display: flex; align-items: center; gap: 7px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; letter-spacing: 0.12em;
-    color: var(--danger); padding: 5px 12px;
-    border: 1px solid rgba(255,56,96,0.2);
-    transition: all 0.3s;
+  .status-indicator.online {
+    color: var(--success);
+    background: rgba(16,185,129,0.08);
+    border-color: rgba(16,185,129,0.2);
   }
-  .status-pill.online { color: var(--safe); border-color: rgba(0,232,160,0.2); }
 
   .status-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--danger);
-    animation: blink 1.5s ease-in-out infinite;
-    flex-shrink: 0;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+    animation: blink 2s ease-in-out infinite;
   }
-  .status-pill.online .status-dot { background: var(--safe); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  .ctrl-btn {
-    width: 32px; height: 32px;
-    background: var(--glass); border: 1px solid var(--border-dim);
-    color: var(--text-dim); font-size: 12px; cursor: pointer;
-    transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  .live-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; color: var(--text-2);
+    padding: 5px 12px; background: var(--surface);
+    border: 1px solid var(--border2); border-radius: 6px;
+    cursor: none; transition: all 0.2s;
   }
-  .ctrl-btn:hover { border-color: var(--border); color: var(--text); }
+  .live-btn:hover { background: var(--card2); border-color: var(--border2); }
+
+  .live-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--success);
+    animation: blink 1.5s infinite;
+  }
+
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--blue-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: white;
+    cursor: none;
+  }
 
   /* ── BODY ── */
   .body {
     flex: 1; display: grid;
-    grid-template-columns: 440px 1fr;
+    grid-template-columns: 420px 1fr;
     min-height: 0; overflow: hidden;
   }
 
   /* ── GLOBE PANE ── */
   .globe-pane {
     position: relative; overflow: hidden;
-    background: var(--globe-bg);
-    border-right: 1px solid var(--border-dim);
-    transition: background 0.5s;
+    background: #080e1a;
+    border-right: 1px solid var(--border);
   }
 
-  .globe-hud-tl {
+  .globe-overlay-tl {
     position: absolute; top: 14px; left: 14px;
-    background: var(--hud-bg);
-    border: 1px solid var(--border);
-    padding: 10px 16px; backdrop-filter: blur(14px);
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    pointer-events: none;
   }
 
-  .globe-hud-tr {
-    position: absolute; top: 14px; right: 14px;
-    background: var(--hud-bg);
-    border: 1px solid rgba(255,56,96,0.25);
-    padding: 10px 16px; backdrop-filter: blur(14px);
-    display: flex; flex-direction: column; align-items: center; gap: 3px;
+  .ov-title {
+    font-size: 10px; font-weight: 600; color: var(--text-3);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 2px;
   }
 
-  .hud-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 22px; font-weight: 800;
-    color: var(--gold); line-height: 1;
-  }
-  .hud-val.danger { color: var(--danger); }
-
-  .hud-key {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px; color: var(--text-dim);
-    letter-spacing: 0.15em; text-transform: uppercase;
+  .ov-sub {
+    font-size: 10px; color: var(--text-4);
   }
 
   .globe-legend {
     position: absolute; bottom: 14px; right: 14px;
-    background: var(--hud-bg);
-    border: 1px solid var(--border-dim);
-    padding: 10px 14px; backdrop-filter: blur(12px);
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 6px;
+    background: rgba(15,23,42,0.85);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    backdrop-filter: blur(10px);
   }
 
-  .leg-row {
-    display: flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim); letter-spacing: 0.12em;
+  .leg-item {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px; color: var(--text-3);
   }
 
   .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
@@ -375,8 +343,7 @@
   /* ── RIGHT PANE ── */
   .right-pane {
     position: relative; overflow: hidden;
-    background: var(--panel-bg);
-    transition: background 0.5s;
+    background: var(--bg);
   }
 
   .panel-wrap {
