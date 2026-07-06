@@ -59,7 +59,7 @@
   style="left:{cursorX}px; top:{cursorY}px"
 ></div>
 
-<div class="app">
+<div class="app" data-theme={$theme}>
   <Sidebar />
 
   <div class="main">
