@@ -11,6 +11,7 @@
   import HistoryPanel from './components/HistoryPanel.svelte'
   import { activePanel, backendOnline, globeRotating } from './stores/appStore.js'
   import { checkHealth } from './utils/api.js'
+  import { theme } from './stores/appStore.js'
 
   let clockStr = '--:--:--'
   let cursorX = 0, cursorY = 0
@@ -88,6 +89,9 @@
           <span class="live-dot"></span>
           {$globeRotating ? 'Live' : 'Paused'}
         </button>
+<button class="theme-btn hoverable" on:click={() => theme.update(t => t === 'dark' ? 'light' : 'dark')}>
+  {$theme === 'dark' ? '☀' : '☾'}
+</button>
         <div class="avatar hoverable">SD</div>
       </div>
     </header>
@@ -319,10 +323,12 @@
 
   /* ── GLOBE PANE ── */
   .globe-pane {
-    position: relative; overflow: hidden;
-    background: #080e1a;
-    border-right: 1px solid var(--border);
-  }
+  background: #080e1a;
+}
+:global([data-theme="light"]) .globe-pane {
+  background: #0d1b2e;
+}
+  
 
   .globe-overlay-tl {
     position: absolute; top: 14px; left: 14px;
@@ -366,4 +372,14 @@
     position: absolute; inset: 0;
     overflow-y: auto; overflow-x: hidden;
   }
+  .theme-btn {
+  width: 32px; height: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px; cursor: none;
+  font-size: 14px; color: var(--text-3);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-btn:hover { background: var(--card2); color: var(--text); }
 </style>

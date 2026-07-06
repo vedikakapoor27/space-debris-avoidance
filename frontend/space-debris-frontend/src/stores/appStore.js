@@ -1,6 +1,6 @@
 import { writable, derived } from 'svelte/store'
 
-export const theme = writable('dark') // 'dark' | 'void'
+export const theme = writable('dark')
 export const backendOnline = writable(false)
 export const prediction = writable(null)
 export const selectedObject = writable(null)
