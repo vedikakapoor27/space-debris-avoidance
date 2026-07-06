@@ -137,32 +137,48 @@
   :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
 
   :global(:root) {
-    --bg:        #0f172a;
-    --bg2:       #111827;
-    --surface:   #1e293b;
-    --card:      #1f2937;
-    --card2:     #243447;
-    --border:    rgba(255,255,255,0.07);
-    --border2:   rgba(255,255,255,0.12);
+  --bg:        #0f172a;
+  --bg2:       #111827;
+  --surface:   #1e293b;
+  --card:      #1f2937;
+  --card2:     #243447;
+  --border:    rgba(255,255,255,0.07);
+  --border2:   rgba(255,255,255,0.12);
+  --blue:      #3b82f6;
+  --blue-dark: #2563eb;
+  --success:   #10b981;
+  --warning:   #f59e0b;
+  --danger:    #ef4444;
+  --text:      #f8fafc;
+  --text-2:    #cbd5e1;
+  --text-3:    #94a3b8;
+  --text-4:    #64748b;
+  --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.3);
+  --radius:    8px;
+  --radius-lg: 12px;
+}
 
-    --blue:      #3b82f6;
-    --blue-dark: #2563eb;
-    --success:   #10b981;
-    --warning:   #f59e0b;
-    --danger:    #ef4444;
-
-    --text:      #f8fafc;
-    --text-2:    #cbd5e1;
-    --text-3:    #94a3b8;
-    --text-4:    #64748b;
-
-    --shadow:    0 1px 3px rgba(0,0,0,0.4), 0 4px 12px rgba(0,0,0,0.25);
-    --shadow-lg: 0 4px 6px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.3);
-
-    --radius:    8px;
-    --radius-lg: 12px;
-  }
-
+:global([data-theme="light"]) {
+  --bg:        #f8fafc;
+  --bg2:       #f1f5f9;
+  --surface:   #e2e8f0;
+  --card:      #ffffff;
+  --card2:     #f8fafc;
+  --border:    rgba(0,0,0,0.08);
+  --border2:   rgba(0,0,0,0.14);
+  --blue:      #2563eb;
+  --blue-dark: #1d4ed8;
+  --success:   #059669;
+  --warning:   #d97706;
+  --danger:    #dc2626;
+  --text:      #0f172a;
+  --text-2:    #1e293b;
+  --text-3:    #475569;
+  --text-4:    #94a3b8;
+  --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 4px 6px rgba(0,0,0,0.07), 0 10px 30px rgba(0,0,0,0.08);
+}
   :global(body) {
     background: var(--bg);
     color: var(--text);
