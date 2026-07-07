@@ -330,10 +330,11 @@
 }
   
 
-  .globe-overlay-tl {
-    position: absolute; top: 14px; left: 14px;
-    pointer-events: none;
-  }
+ .globe-overlay-tl {
+  position: absolute; top: 14px; left: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
 
   .ov-title {
     font-size: 10px; font-weight: 600; color: var(--text-3);
