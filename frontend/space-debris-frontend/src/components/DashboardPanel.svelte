@@ -143,11 +143,11 @@
   }
 
   .dp-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 24px; font-weight: 800;
-    color: var(--text); line-height: 1.15;
-    letter-spacing: -0.01em;
-  }
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px; font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
 
   .dp-live {
     display: flex; align-items: center; gap: 7px;
@@ -205,22 +205,30 @@
     transition: width 1.2s ease;
   }
 
-  .section { border: 1px solid var(--border-dim); overflow: hidden; }
+  .section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
 
   .section-head {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 11px 16px; border-bottom: 1px solid var(--border-dim);
-    background: var(--glass);
-  }
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card2);
+}
 
   .section-title-wrap { display: flex; align-items: center; gap: 8px; }
   .section-flash { font-size: 12px; }
 
   .section-title {
     font-family: 'Syne', sans-serif;
-    font-size: 11px; font-weight: 700;
-    color: var(--accent-hi); letter-spacing: 0.1em; text-transform: uppercase;
-  }
+  font-size: 12px; font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
 
   .section-badge {
     font-family: 'JetBrains Mono', monospace;
@@ -232,17 +240,20 @@
   .ctable { width: 100%; border-collapse: collapse; }
 
   .ctable th {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px; letter-spacing: 0.15em; color: var(--text-dim);
-    padding: 8px 12px; text-align: left;
-    border-bottom: 1px solid var(--border-dim);
-    text-transform: uppercase;
-  }
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em;
+  color: var(--text-3);
+  padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  background: var(--card2);
+}
 
-  .crow td {
-    padding: 10px 12px; border-bottom: 1px solid var(--border-dim);
-    transition: background 0.15s;
-  }
+.crow td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 13px;
+}
   .crow:last-child td { border-bottom: none; }
   .crow:hover td { background: var(--glass); }
   .crow-high td { background: rgba(255,56,96,0.03); }
