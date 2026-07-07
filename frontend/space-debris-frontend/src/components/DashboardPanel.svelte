@@ -165,14 +165,19 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
 
   .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-
-  .stat-card {
-    background: var(--glass);
-    border: 1px solid var(--border-dim);
-    padding: 18px 16px 14px;
-    position: relative; overflow: hidden;
-    transition: border-color 0.2s, transform 0.2s;
-  }
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  padding: 18px 16px 14px;
+  border-radius: var(--radius);
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
   .stat-card:hover { border-color: var(--ac); transform: translateY(-1px); }
 
   .stat-ico {
@@ -180,10 +185,11 @@
   }
 
   .stat-val {
-    font-family: 'Syne', sans-serif;
-    font-size: 30px; font-weight: 800;
-    color: var(--ac); line-height: 1; margin-bottom: 6px;
-  }
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 30px; font-weight: 800;
+  color: var(--text);
+  line-height: 1; margin-bottom: 6px;
+}
   .stat-unit { font-size: 14px; font-weight: 400; }
 
   .stat-lbl {
