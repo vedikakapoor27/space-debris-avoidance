@@ -137,11 +137,11 @@
   }
 
   .dp-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px; color: var(--text-dim);
-    letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 8px;
-  }
-
+  font-size: 10px; font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  margin-bottom: 8px;
+}
   .dp-title {
   font-family: 'Space Grotesk', sans-serif;
   font-size: 24px; font-weight: 700;
