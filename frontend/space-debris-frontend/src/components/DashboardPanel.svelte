@@ -181,29 +181,29 @@
   .stat-card:hover { border-color: var(--ac); transform: translateY(-1px); }
 
   .stat-ico {
-    font-size: 14px; margin-bottom: 8px; display: block; opacity: 0.7;
-  }
+  font-size: 13px; margin-bottom: 10px;
+  display: block; color: var(--text-3);
+}
 
   .stat-val {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 30px; font-weight: 800;
+  font-size: 30px; font-weight: 700;
   color: var(--text);
   line-height: 1; margin-bottom: 6px;
 }
-  .stat-unit { font-size: 14px; font-weight: 400; }
+ .stat-unit { font-size: 14px; font-weight: 400; }
 
   .stat-lbl {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 8px; color: var(--text-dim);
-    letter-spacing: 0.14em; text-transform: uppercase;
-    margin-bottom: 12px;
-  }
-
+  font-size: 11px; font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 14px;
+}
   .stat-bar {
-    position: absolute; bottom: 0; left: 0;
-    width: var(--pct); height: 2px; background: var(--ac);
-    transition: width 1.2s ease;
-  }
+  position: absolute; bottom: 0; left: 0;
+  width: var(--pct); height: 2px;
+  background: var(--ac);
+}
 
   .section {
   border: 1px solid var(--border);
