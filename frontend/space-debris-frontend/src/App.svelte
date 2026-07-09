@@ -330,8 +330,19 @@
 }
   
 
- .globe-overlay-tl {
-  position: absolute; top: 14px; left: 14px;
+ .topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 52px; min-height: 52px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  z-index: 20;
+  position: relative;
+}
+
+.globe-overlay-tl {
+  position: absolute;
+  top: 14px;
+  left: 14px;
   pointer-events: none;
   z-index: 2;
 }
