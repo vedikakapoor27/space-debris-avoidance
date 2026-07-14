@@ -80,12 +80,18 @@
     background: var(--bg2);
     border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
+    transition: background 0.3s;
+    z-index: 40;
+    position: relative;
   }
 
+  /* LOGO — fixed layout, no overlap */
   .logo {
     display: flex; align-items: center; gap: 10px;
-    padding: 18px 16px;
+    padding: 14px 16px;
     border-bottom: 1px solid var(--border);
+    min-height: 64px;
+    flex-shrink: 0;
   }
 
   .logo-icon {
@@ -96,21 +102,31 @@
     flex-shrink: 0;
   }
 
+  .logo-text {
+    display: flex; flex-direction: column;
+    gap: 2px; min-width: 0;
+  }
+
   .logo-name {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 14px; font-weight: 700; color: var(--text);
-    letter-spacing: 0.08em; line-height: 1;
+    font-size: 14px; font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.08em;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .logo-sub {
-    font-size: 10px; color: var(--text-4);
-    margin-top: 2px; letter-spacing: 0.02em;
+    font-size: 9.5px; color: var(--text-4);
+    line-height: 1; white-space: nowrap;
+    letter-spacing: 0.01em;
   }
 
   .sys-status {
     display: flex; align-items: center; gap: 7px;
-    padding: 9px 16px;
+    padding: 8px 16px;
     border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
   }
 
   .sys-dot {
@@ -125,61 +141,102 @@
   }
 
   .nav-group-label {
-    font-size: 10px; font-weight: 600; color: var(--text-4);
+    font-size: 10px; font-weight: 600;
+    color: var(--text-4);
     letter-spacing: 0.1em; text-transform: uppercase;
     padding: 14px 16px 6px;
   }
 
-  .nav-list { list-style: none; flex: 1; padding: 4px 8px; display: flex; flex-direction: column; gap: 1px; }
+  .nav-list {
+    list-style: none; flex: 1;
+    padding: 4px 8px;
+    display: flex; flex-direction: column; gap: 2px;
+    overflow-y: auto;
+  }
 
   .nav-item {
     width: 100%; display: flex; align-items: center; gap: 10px;
     padding: 9px 10px; background: none; border: none;
     color: var(--text-3); text-align: left; cursor: none;
-    border-radius: var(--radius); transition: all 0.15s;
+    border-radius: var(--radius);
+    transition: background 0.15s, color 0.15s;
     position: relative;
   }
 
-  .nav-item:hover { background: var(--surface); color: var(--text-2); }
+  .nav-item:hover {
+    background: var(--surface);
+    color: var(--text-2);
+  }
 
   .nav-item.active {
     background: rgba(59,130,246,0.1);
     color: var(--blue);
-    border: 1px solid rgba(59,130,246,0.15);
+    border: 1px solid rgba(59,130,246,0.18);
+    font-weight: 600;
   }
 
-  .nav-icon { width: 20px; flex-shrink: 0; display: flex; align-items: center; }
+  /* active left accent line */
+  .nav-item.active::before {
+    content: '';
+    position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 2px; background: var(--blue);
+    border-radius: 0 2px 2px 0;
+  }
+
+  :global([data-theme="light"]) .nav-item:hover {
+    background: #f1f5f9;
+    color: var(--text);
+  }
+
+  :global([data-theme="light"]) .nav-item.active {
+    background: rgba(37,99,235,0.08);
+    border-color: rgba(37,99,235,0.2);
+  }
+
+  .nav-icon {
+    width: 20px; flex-shrink: 0;
+    display: flex; align-items: center;
+    transition: color 0.15s;
+  }
 
   .nav-text { display: flex; flex-direction: column; gap: 1px; flex: 1; }
 
   .nav-label { font-size: 13px; font-weight: 500; line-height: 1; }
-
-  .nav-sub { font-size: 10px; opacity: 0.6; line-height: 1; }
+  .nav-sub   { font-size: 10px; opacity: 0.6; line-height: 1; }
 
   .badge {
     background: var(--danger); color: white;
     font-size: 10px; font-weight: 600;
     padding: 1px 6px; border-radius: 10px;
+    animation: pulse 1.5s infinite;
   }
 
   .sidebar-footer {
     padding: 14px 16px;
     border-top: 1px solid var(--border);
     display: flex; flex-direction: column; gap: 12px;
+    flex-shrink: 0;
   }
 
-  .footer-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .footer-grid {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: 8px;
+  }
 
   .fstat { text-align: center; }
 
   .fval {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 18px; font-weight: 700; color: var(--text); line-height: 1;
+    font-size: 18px; font-weight: 700;
+    color: var(--text); line-height: 1;
   }
   .fval.danger  { color: var(--danger); }
   .fval.success { color: var(--success); }
 
-  .fkey { font-size: 9px; color: var(--text-4); margin-top: 3px; letter-spacing: 0.06em; }
+  .fkey {
+    font-size: 9px; color: var(--text-4);
+    margin-top: 3px; letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 
   .footer-version {
     font-size: 10px; color: var(--text-4); text-align: center;
