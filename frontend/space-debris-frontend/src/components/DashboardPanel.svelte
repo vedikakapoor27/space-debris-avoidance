@@ -181,14 +181,15 @@
 }
   .stat-card:hover { border-color: var(--ac); transform: translateY(-1px); }
 
-  .stat-ico {
+ .stat-ico {
   font-size: 13px; margin-bottom: 10px;
-  display: block; color: var(--text-3);
+  display: block;
+  color: var(--blue);
+  opacity: 0.7;
 }
-
   .stat-val {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 30px; font-weight: 700;
+  font-size: 32px; font-weight: 700;
   color: var(--text);
   line-height: 1; margin-bottom: 6px;
 }
