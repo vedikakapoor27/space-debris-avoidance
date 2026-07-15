@@ -20,12 +20,13 @@
 
   const riskCls = r => r === 'HIGH' ? 'high' : r === 'MEDIUM' ? 'med' : 'low'
 
-  const statCards = [
-    { key: 'tracked',       label: 'Tracked Objects', color: 'var(--accent-hi)', pct: '85%' },
-    { key: 'active_sats',   label: 'Active Satellites', color: 'var(--safe)', pct: '40%' },
-    { key: 'high_risk',     label: 'Critical Alerts', color: 'var(--danger)', pct: '20%' },
-    { key: 'avg_distance',  label: 'Avg Miss Dist', color: 'var(--gold)', pct: '55%' },
-  ]
+ const statCards = [
+  { key: 'tracked',      label: 'Tracked Objects',  color: 'var(--blue)',    pct: '85%' },
+  { key: 'active_sats',  label: 'Active Satellites', color: 'var(--success)', pct: '40%' },
+  { key: 'high_risk',    label: 'Critical Alerts',   color: 'var(--danger)',  pct: '20%' },
+  { key: 'avg_distance', label: 'Avg Miss Dist',      color: 'var(--warning)', pct: '55%' },
+]
+  
 </script>
 
 <div class="dp">
