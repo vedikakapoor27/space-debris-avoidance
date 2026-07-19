@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: astraeus
+      POSTGRES_PASSWORD: astraeus123
+      POSTGRES_DB: astraeus_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./Backend/ml
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://astraeus:astraeus123@db:5432/astraeus_db
+      SECRET_KEY: change-this-in-production
+      JWT_SECRET_KEY: change-this-jwt-key
+      CORS_ORIGINS: http://localhost:5173,https://your-frontend.vercel.app
+    depends_on:
+      - db
+    volumes:
+      - ./Backend/ml:/app
+
+  frontend:
+    build: ./frontend/space-debris-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
