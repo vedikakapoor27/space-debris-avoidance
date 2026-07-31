@@ -81,19 +81,19 @@
       </div>
 
       <div class="topbar-right">
-        <div class="status-indicator" class:online={$backendOnline}>
-          <span class="status-dot"></span>
-          <span>{$backendOnline ? 'Backend Online' : 'Backend Offline'}</span>
-        </div>
-        <button class="live-btn hoverable" on:click={() => globeRotating.update(v => !v)}>
-          <span class="live-dot"></span>
-          {$globeRotating ? 'Live' : 'Paused'}
-        </button>
-<button class="theme-btn hoverable" on:click={() => theme.update(t => t === 'dark' ? 'light' : 'dark')}>
-  {$theme === 'dark' ? '☀' : '☾'}
-</button>
-        <div class="avatar hoverable">SD</div>
-      </div>
+  <div class="status-indicator" class:online={$backendOnline}>
+    <span class="status-dot"></span>
+    {$backendOnline ? 'ONLINE' : 'OFFLINE'}
+  </div>
+  <button class="topbar-btn hoverable" on:click={() => globeRotating.update(v => !v)}>
+    <span class="live-dot"></span>
+    {$globeRotating ? 'LIVE' : 'HOLD'}
+  </button>
+  <button class="theme-btn hoverable" on:click={() => theme.update(t => t === 'dark' ? 'light' : 'dark')}>
+    {$theme === 'dark' ? '○' : '●'}
+  </button>
+  <div class="avatar hoverable">SD</div>
+</div>
     </header>
 
     <div class="body">
