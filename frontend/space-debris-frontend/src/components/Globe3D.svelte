@@ -13,11 +13,12 @@
   let tooltip = null
   let tooltipX = 0, tooltipY = 0
 
-  const riskColor = (r) => {
-    if (r > 0.7) return 0xef4444
-    if (r > 0.3) return 0xf59e0b
-    return 0x3b82f6
-  }
+ // Debris colors — monochrome only
+const riskColor = (r) => {
+  if (r > 0.7) return 0xffffff   // white = critical
+  if (r > 0.3) return 0x888888   // gray = warning
+  return 0x444444                 // dark gray = nominal
+}
 
   onMount(() => {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
@@ -29,15 +30,10 @@
     camera = new THREE.PerspectiveCamera(40, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
     camera.position.set(0, 0, 4.2)
 
-    // Minimal stars — very faint
-    const starGeo = new THREE.BufferGeometry()
-    const N = 1500
-    const starPos = new Float32Array(N * 3)
-    for (let i = 0; i < N * 3; i++) starPos[i] = (Math.random() - 0.5) * 80
-    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
-    const starMat = new THREE.PointsMaterial({ color: 0x94a3b8, size: 0.025, transparent: true, opacity: 0.4 })
-    scene.add(new THREE.Points(starGeo, starMat))
-
+   const starMat = new THREE.PointsMaterial({ 
+    color: 0x888888, size: 0.02, 
+    transparent: true, opacity: 0.3 
+    })
     // Earth with real texture
     const loader = new THREE.TextureLoader()
     const earthGeo = new THREE.SphereGeometry(1, 64, 64)
@@ -69,19 +65,18 @@
     earth = new THREE.Mesh(earthGeo, earthMat)
     scene.add(earth)
 
-    // Thin atmosphere
-    const atmoGeo = new THREE.SphereGeometry(1.02, 32, 32)
-    const atmoMat = new THREE.MeshBasicMaterial({
-      color: 0x4488ff, transparent: true, opacity: 0.06, side: THREE.FrontSide
-    })
+   const atmoMat = new THREE.MeshBasicMaterial({
+  color: 0x222233, transparent: true,
+  opacity: 0.04, side: THREE.FrontSide
+})
     scene.add(new THREE.Mesh(atmoGeo, atmoMat))
 
-    // Orbit rings — thin and clean
-    const ringDefs = [
-      { r: 1.4, tilt: 0.2,  color: 0x3b82f6, opacity: 0.15 },
-      { r: 1.7, tilt: 0.5,  color: 0x64748b, opacity: 0.12 },
-      { r: 2.1, tilt: 0.75, color: 0x3b82f6, opacity: 0.1  },
-    ]
+    // Orbit rings — pure white/gray, no color
+const ringDefs = [
+  { r: 1.4, tilt: 0.2,  color: 0xffffff, opacity: 0.08 },
+  { r: 1.7, tilt: 0.5,  color: 0xaaaaaa, opacity: 0.06 },
+  { r: 2.1, tilt: 0.75, color: 0x888888, opacity: 0.05 },
+]
     ringDefs.forEach(({ r, tilt, color, opacity }) => {
       const geo = new THREE.TorusGeometry(r, 0.002, 8, 140)
       const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity })
