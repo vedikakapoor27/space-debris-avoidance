@@ -4,79 +4,68 @@
   import { generateDebrisField } from '../utils/api.js'
   import { selectedObject, globeRotating } from '../stores/appStore.js'
 
-  let canvas
-  let animId
-  let renderer, scene, camera, earth, clouds
+  let canvas, animId
+  let renderer, scene, camera, earth
   let debrisMeshes = [], orbitRings = []
   let raycaster, mouse
   let debris = generateDebrisField(120)
   let tooltip = null
   let tooltipX = 0, tooltipY = 0
 
- // Debris colors — monochrome only
-const riskColor = (r) => {
-  if (r > 0.7) return 0xffffff   // white = critical
-  if (r > 0.3) return 0x888888   // gray = warning
-  return 0x444444                 // dark gray = nominal
-}
+  const riskColor = (r) => {
+    if (r > 0.7) return 0xffffff
+    if (r > 0.3) return 0x888888
+    return 0x444444
+  }
 
   onMount(() => {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
     renderer.setSize(canvas.clientWidth, canvas.clientHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.shadowMap.enabled = true
 
     scene = new THREE.Scene()
     camera = new THREE.PerspectiveCamera(40, canvas.clientWidth / canvas.clientHeight, 0.1, 100)
     camera.position.set(0, 0, 4.2)
 
-   const starMat = new THREE.PointsMaterial({ 
-    color: 0x888888, size: 0.02, 
-    transparent: true, opacity: 0.3 
-    })
-    // Earth with real texture
+    // ── STARS ──
+    const starGeo = new THREE.BufferGeometry()
+    const N = 1500
+    const starPos = new Float32Array(N * 3)
+    for (let i = 0; i < N * 3; i++) starPos[i] = (Math.random() - 0.5) * 80
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
+    const starMat = new THREE.PointsMaterial({ color: 0x888888, size: 0.02, transparent: true, opacity: 0.3 })
+    scene.add(new THREE.Points(starGeo, starMat))
+
+    // ── EARTH ──
     const loader = new THREE.TextureLoader()
     const earthGeo = new THREE.SphereGeometry(1, 64, 64)
-
-    // Use a reliable earth texture
-    const earthTex = loader.load(
-      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
-      undefined, undefined,
-      () => {
-        // fallback if texture fails — use procedural
-        earthMesh.material.color.setHex(0x1a4a6b)
-      }
-    )
-    const earthBump = loader.load(
-      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg'
-    )
-    const earthSpec = loader.load(
-      'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg'
-    )
+    const earthTex  = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg')
+    const earthBump = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg')
+    const earthSpec = loader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg')
 
     const earthMat = new THREE.MeshPhongMaterial({
       map: earthTex,
-      bumpMap: earthBump,
-      bumpScale: 0.015,
+      bumpMap: earthBump, bumpScale: 0.015,
       specularMap: earthSpec,
-      specular: new THREE.Color(0x222222),
-      shininess: 8,
+      specular: new THREE.Color(0x222222), shininess: 8,
     })
     earth = new THREE.Mesh(earthGeo, earthMat)
     scene.add(earth)
 
-   const atmoMat = new THREE.MeshBasicMaterial({
-  color: 0x222233, transparent: true,
-  opacity: 0.04, side: THREE.FrontSide
-})
+    // ── ATMOSPHERE ──
+    const atmoGeo = new THREE.SphereGeometry(1.02, 32, 32)
+    const atmoMat = new THREE.MeshBasicMaterial({
+      color: 0x222233, transparent: true,
+      opacity: 0.04, side: THREE.FrontSide
+    })
     scene.add(new THREE.Mesh(atmoGeo, atmoMat))
 
-    // Orbit rings — pure white/gray, no color
-const ringDefs = [
-  { r: 1.4, tilt: 0.2,  color: 0xffffff, opacity: 0.08 },
-  { r: 1.7, tilt: 0.5,  color: 0xaaaaaa, opacity: 0.06 },
-  { r: 2.1, tilt: 0.75, color: 0x888888, opacity: 0.05 },
-]
+    // ── ORBIT RINGS ──
+    const ringDefs = [
+      { r: 1.4, tilt: 0.2,  color: 0xffffff, opacity: 0.08 },
+      { r: 1.7, tilt: 0.5,  color: 0xaaaaaa, opacity: 0.06 },
+      { r: 2.1, tilt: 0.75, color: 0x888888, opacity: 0.05 },
+    ]
     ringDefs.forEach(({ r, tilt, color, opacity }) => {
       const geo = new THREE.TorusGeometry(r, 0.002, 8, 140)
       const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity })
@@ -87,11 +76,11 @@ const ringDefs = [
       orbitRings.push(ring)
     })
 
-    // Debris — clean dots, no glow
+    // ── DEBRIS ──
     debris.forEach(d => {
       const size = d.risk > 0.7 ? 0.012 : 0.007
-      const geo = new THREE.SphereGeometry(size, 5, 5)
-      const mat = new THREE.MeshBasicMaterial({ color: riskColor(d.risk) })
+      const geo  = new THREE.SphereGeometry(size, 5, 5)
+      const mat  = new THREE.MeshBasicMaterial({ color: riskColor(d.risk) })
       const mesh = new THREE.Mesh(geo, mat)
       mesh.position.set(d.x, d.y, d.z)
       mesh.userData = d
@@ -99,30 +88,28 @@ const ringDefs = [
       debrisMeshes.push(mesh)
     })
 
-    // Lighting — realistic sun
-    scene.add(new THREE.AmbientLight(0x404060, 1.2))
+    // ── LIGHTING ──
+    scene.add(new THREE.AmbientLight(0x404040, 1.2))
     const sun = new THREE.DirectionalLight(0xffffff, 2.8)
     sun.position.set(8, 3, 4)
     scene.add(sun)
 
-    // Mouse
+    // ── MOUSE ──
     raycaster = new THREE.Raycaster()
     mouse = new THREE.Vector2()
-
-    let isDragging = false, prevX = 0, prevY = 0
-    let velX = 0, velY = 0
+    let isDragging = false, prevX = 0, prevY = 0, velX = 0, velY = 0
 
     canvas.addEventListener('mousedown', e => {
       isDragging = true; prevX = e.clientX; prevY = e.clientY; velX = 0; velY = 0
     })
     window.addEventListener('mouseup', () => { isDragging = false })
+
     canvas.addEventListener('mousemove', e => {
       const rect = canvas.getBoundingClientRect()
       mouse.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
       mouse.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
       tooltipX = e.clientX - rect.left
       tooltipY = e.clientY - rect.top
-
       if (isDragging) {
         velX = (e.clientX - prevX) * 0.005
         velY = (e.clientY - prevY) * 0.003
@@ -130,14 +117,11 @@ const ringDefs = [
         earth.rotation.x += velY
         prevX = e.clientX; prevY = e.clientY
       }
-
-      // hover detection
       raycaster.setFromCamera(mouse, camera)
       const hits = raycaster.intersectObjects(debrisMeshes)
       tooltip = hits.length ? hits[0].object.userData : null
     })
 
-    // Scroll to zoom
     canvas.addEventListener('wheel', e => {
       camera.position.z = Math.max(2.5, Math.min(7, camera.position.z + e.deltaY * 0.005))
     })
@@ -155,31 +139,27 @@ const ringDefs = [
     })
     ro.observe(canvas)
 
+    // ── ANIMATION ──
     let t = 0
     const tick = () => {
       animId = requestAnimationFrame(tick)
       t += 0.005
-
       let rotating = true
       globeRotating.subscribe(v => rotating = v)()
-
       if (rotating) {
         earth.rotation.y += 0.001
-        // inertia
         if (!isDragging) {
           velX *= 0.95; velY *= 0.95
           earth.rotation.y += velX
           earth.rotation.x += velY
         }
       }
-
       debrisMeshes.forEach((mesh, i) => {
         const d = debris[i]
         const a = t * d.speed * 25
         mesh.position.x = d.x * Math.cos(a) - d.z * Math.sin(a)
         mesh.position.z = d.x * Math.sin(a) + d.z * Math.cos(a)
       })
-
       orbitRings.forEach((r, i) => { r.rotation.z += 0.0002 * (i + 1) })
       renderer.render(scene, camera)
     }
