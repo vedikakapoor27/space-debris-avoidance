@@ -104,11 +104,11 @@
           <div class="ov-sub">Drag to rotate · Scroll to zoom</div>
         </div>
         <div class="globe-legend">
-          <div class="leg-item"><span class="leg-dot" style="background:#3b82f6"></span>Active Satellite</div>
-          <div class="leg-item"><span class="leg-dot" style="background:#94a3b8"></span>Debris</div>
-          <div class="leg-item"><span class="leg-dot" style="background:#ef4444"></span>Critical</div>
-          <div class="leg-item"><span class="leg-dot" style="background:#f59e0b"></span>Warning</div>
-        </div>
+  <div class="leg-item"><span class="leg-dot" style="background:#ffffff"></span>CRITICAL</div>
+  <div class="leg-item"><span class="leg-dot" style="background:#888888"></span>WARNING</div>
+  <div class="leg-item"><span class="leg-dot" style="background:#444444"></span>NOMINAL</div>
+  <div class="leg-item"><span class="leg-dot" style="background:#aaaaaa"></span>SATELLITE</div>
+</div>
       </div>
 
       <div class="right-pane">
