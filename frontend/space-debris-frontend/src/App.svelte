@@ -213,7 +213,7 @@
   :global(body) {
     background: var(--bg);
     color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
+    font-family: 'Inter' ,sans-serif;
     font-size: 13px;
     height: 100vh;
     overflow: hidden;

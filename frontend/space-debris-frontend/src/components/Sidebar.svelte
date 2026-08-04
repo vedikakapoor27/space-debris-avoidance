@@ -14,12 +14,12 @@
   <div class="logo">
     <div class="logo-icon">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="10" stroke="#3b82f6" stroke-width="1.5"/>
-        <circle cx="12" cy="12" r="4"  stroke="#3b82f6" stroke-width="1.5"/>
-        <circle cx="12" cy="12" r="1"  fill="#3b82f6"/>
-        <line x1="2" y1="12" x2="8"  y2="12" stroke="#3b82f6" stroke-width="1"/>
-        <line x1="16" y1="12" x2="22" y2="12" stroke="#3b82f6" stroke-width="1"/>
-      </svg>
+  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" opacity="0.8"/>
+  <circle cx="12" cy="12" r="4"  stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="12" cy="12" r="1"  fill="currentColor"/>
+  <line x1="2" y1="12" x2="8"  y2="12" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+  <line x1="16" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+</svg>
     </div>
     <div>
       <div class="logo-name">ASTRAEUS</div>
@@ -99,7 +99,7 @@
   }
 
   .logo-name {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 13px; font-weight: 700;
     color: var(--text); letter-spacing: 0.1em;
     line-height: 1; white-space: nowrap;
@@ -107,7 +107,7 @@
   }
 
   .logo-sub {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-4);
     line-height: 1; white-space: nowrap;
     letter-spacing: 0.08em; margin-top: 3px;
@@ -129,14 +129,14 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
   .sys-text {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; font-weight: 500;
     color: var(--text-3); letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .nav-group-label {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-4);
     letter-spacing: 0.18em; text-transform: uppercase;
     padding: 12px 14px 5px;
@@ -189,14 +189,14 @@
   }
 
   .nav-sub {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; opacity: 0.5; line-height: 1;
     letter-spacing: 0.06em;
   }
 
   .badge {
     background: var(--text); color: var(--bg);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; font-weight: 600;
     padding: 1px 5px;
   }
@@ -215,7 +215,7 @@
   .fstat { text-align: center; }
 
   .fval {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 16px; font-weight: 700;
     color: var(--text); line-height: 1;
   }
@@ -223,15 +223,15 @@
   .fval.success { color: var(--text-3); }
 
   .fkey {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 7px; color: var(--text-4);
     margin-top: 3px; letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .footer-version {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-4);
     text-align: center; letter-spacing: 0.08em;
   }
-</style>
+</style> 
