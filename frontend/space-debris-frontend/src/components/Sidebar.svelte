@@ -1,13 +1,47 @@
 <script>
   import { activePanel, alertCount } from '../stores/appStore.js'
 
-  const navItems = [
-    { id: 'dashboard',    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`, label: 'Dashboard',    sub: 'Overview' },
-    { id: 'predict',      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>`, label: 'Risk Predict', sub: 'AI Analysis' },
-    { id: 'conjunctions', icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/></svg>`, label: 'Conjunctions', sub: 'TCA Events' },
-    { id: 'telemetry',    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>`, label: 'Telemetry',    sub: 'Live Feed' },
-    { id: 'history',      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, label: 'History',      sub: 'Analytics' },
-  ]
+ const navItems = [
+  { 
+    id: 'dashboard',
+    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+      <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
+    </svg>`,
+    label: 'Dashboard', sub: 'Overview'
+  },
+  {
+    id: 'predict',
+    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+      <path d="M12 8v4l3 3"/>
+    </svg>`,
+    label: 'Risk Predict', sub: 'AI Analysis'
+  },
+  {
+    id: 'conjunctions',
+    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>`,
+    label: 'Conjunctions', sub: 'TCA Events'
+  },
+  {
+    id: 'telemetry',
+    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+    </svg>`,
+    label: 'Telemetry', sub: 'Live Feed'
+  },
+  {
+    id: 'history',
+    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
+    </svg>`,
+    label: 'History', sub: 'Analytics'
+  },
+]
 </script>
 
 <nav class="sidebar">
@@ -92,12 +126,12 @@
   }
 
   .logo-icon {
-    width: 30px; height: 30px;
-    border: 1px solid var(--border2);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
+  width: 30px; height: 30px;
+  border: 1px solid var(--border2);
+  color: var(--text-3);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
   .logo-name {
     font-family: 'Inter', sans-serif;
     font-size: 13px; font-weight: 700;
