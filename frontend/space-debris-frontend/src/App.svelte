@@ -74,9 +74,25 @@
     <span class="live-dot"></span>
     {$globeRotating ? 'LIVE' : 'HOLD'}
   </button>
-  <button class="theme-btn hoverable" on:click={() => theme.update(t => t === 'dark' ? 'light' : 'dark')}>
-    {$theme === 'dark' ? '○' : '●'}
-  </button>
+  <button class="theme-btn" on:click={() => theme.update(t => t === 'dark' ? 'light' : 'dark')}>
+  {#if $theme === 'dark'}
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+  {:else}
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  {/if}
+</button>
   <div class="avatar hoverable">SD</div>
 </div>
     </header>
@@ -162,35 +178,35 @@
      LIGHT THEME — white aerospace
   ══════════════════════════════════ */
   :global([data-theme="light"]) {
-    --bg:         #f5f5f5;
-    --bg2:        #ffffff;
-    --surface:    #eeeeee;
-    --card:       #ffffff;
-    --card2:      #f9f9f9;
-    --border:     #d0d0d0;
-    --border2:    #b8b8b8;
-    --divider:    #e4e4e4;
+  --bg:         #ffffff;
+  --bg2:        #fafafa;
+  --surface:    #f4f4f4;
+  --card:       #ffffff;
+  --card2:      #f9f9f9;
+  --border:     #e0e0e0;
+  --border2:    #c8c8c8;
+  --divider:    #ebebeb;
 
-    --text:       #000000;
-    --text-2:     #1a1a1a;
-    --text-3:     #555555;
-    --text-4:     #999999;
+  --text:       #0a0a0a;
+  --text-2:     #1a1a1a;
+  --text-3:     #444444;
+  --text-4:     #888888;
 
-    --danger:     #000000;
-    --warning:    #333333;
-    --success:    #555555;
+  --danger:     #0a0a0a;
+  --warning:    #2a2a2a;
+  --success:    #444444;
 
-    --danger-bg:  rgba(0,0,0,0.06);
-    --warning-bg: rgba(0,0,0,0.03);
-    --success-bg: rgba(0,0,0,0.02);
+  --danger-bg:  rgba(0,0,0,0.05);
+  --warning-bg: rgba(0,0,0,0.03);
+  --success-bg: rgba(0,0,0,0.02);
 
-    --shadow:     0 1px 4px rgba(0,0,0,0.08);
-    --shadow-lg:  0 4px 20px rgba(0,0,0,0.12);
+  --shadow:     0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-lg:  0 4px 16px rgba(0,0,0,0.1);
 
-    --globe-bg:   #0a0a12;
-    --sidebar-bg: #fafafa;
-    --topbar-bg:  #ffffff;
-  }
+  --globe-bg:   #08080f;
+  --sidebar-bg: #ffffff;
+  --topbar-bg:  #ffffff;
+}
 
   /* ── GLOBAL ── */
   :global(*) { box-sizing: border-box; margin: 0; padding: 0; }
@@ -213,29 +229,9 @@
   :global(::-webkit-scrollbar-track) { background: transparent; }
   :global(::-webkit-scrollbar-thumb) { background: var(--border); }
 
-  /* ── CURSOR ── */
-  .cursor {
-    position: fixed; pointer-events: none; z-index: 9999;
-    width: 24px; height: 24px;
-    border: 1px solid var(--text);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.2s, height 0.2s, opacity 0.2s;
-    opacity: 0.7;
-  }
+  
 
-  .cursor.cursor-hover {
-    width: 36px; height: 36px; opacity: 1;
-  }
-
-  .cursor-dot {
-    position: fixed; pointer-events: none; z-index: 9999;
-    width: 3px; height: 3px;
-    background: var(--text);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-  }
-
+  
   /* ── LAYOUT ── */
   .app {
     display: flex; height: 100vh; width: 100vw;
@@ -424,4 +420,68 @@
     position: absolute; inset: 0;
     overflow-y: auto; overflow-x: hidden;
   }
+  /* Light mode — stronger contrast everywhere */
+:global([data-theme="light"]) .stat-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+:global([data-theme="light"]) .section {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+:global([data-theme="light"]) .section-head {
+  background: #f4f4f4;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+:global([data-theme="light"]) .ctable th {
+  background: #f4f4f4;
+  color: #444444;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+:global([data-theme="light"]) .crow td {
+  color: #1a1a1a;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+:global([data-theme="light"]) .crow:hover td {
+  background: #f9f9f9;
+}
+
+:global([data-theme="light"]) .pill.high {
+  color: #0a0a0a;
+  border-color: #0a0a0a;
+  background: rgba(0,0,0,0.06);
+}
+
+:global([data-theme="light"]) .pill.med {
+  color: #333333;
+  border-color: #888888;
+  background: rgba(0,0,0,0.03);
+}
+
+:global([data-theme="light"]) .pill.low {
+  color: #666666;
+  border-color: #bbbbbb;
+  background: rgba(0,0,0,0.02);
+}
+
+:global([data-theme="light"]) .sidebar {
+  border-right: 1px solid #e0e0e0;
+}
+
+:global([data-theme="light"]) .nav-item.active {
+  background: #f0f0f0;
+  color: #0a0a0a;
+}
+
+:global([data-theme="light"]) .topbar {
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
 </style>
