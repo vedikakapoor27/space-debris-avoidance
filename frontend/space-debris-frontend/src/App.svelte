@@ -14,8 +14,6 @@
   import { theme } from './stores/appStore.js'
 
   let clockStr = '--:--:--'
-  let cursorX = 0, cursorY = 0
-  let cursorHover = false
 
   onMount(async () => {
     const tick = () => {
