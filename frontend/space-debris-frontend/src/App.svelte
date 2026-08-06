@@ -28,10 +28,7 @@
     try { await checkHealth(); backendOnline.set(true) }
     catch { backendOnline.set(false) }
 
-    const move = (e) => { cursorX = e.clientX; cursorY = e.clientY }
-    const over = (e) => { cursorHover = !!e.target.closest('button, a, .hoverable') }
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseover', over)
+  
 
     return () => {
       clearInterval(id)
@@ -49,16 +46,6 @@
   }
 </script>
 
-<!-- Custom cursor -->
-<div
-  class="cursor"
-  class:cursor-hover={cursorHover}
-  style="left:{cursorX}px; top:{cursorY}px"
-></div>
-<div
-  class="cursor-dot"
-  style="left:{cursorX}px; top:{cursorY}px"
-></div>
 
 <div class="app" data-theme={$theme}>
   <Sidebar />
