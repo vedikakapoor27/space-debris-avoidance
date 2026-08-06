@@ -33,7 +33,7 @@
 
   <div class="dp-header">
     <div class="dp-eyebrow">Mission Overview</div>
-    <h2 class="dp-title">Orbital Collision<br>Monitoring</h2>
+    <h2 class="dp-title">Orbital Collision Monitoring</h2>
     <div class="dp-live">
       <span class="live-dot"></span>LIVE
     </div>
@@ -148,11 +148,12 @@
   }
 
   .dp-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 20px; font-weight: 700;
-    color: var(--text); line-height: 1.2;
-    letter-spacing: -0.01em; text-transform: uppercase;
-  }
+  font-family: 'Inter', sans-serif;
+  font-size: 20px; font-weight: 800;
+  color: var(--text); line-height: 1.1;
+  letter-spacing: -0.02em; text-transform: uppercase;
+  white-space: nowrap;
+}
 
   .dp-live {
     display: flex; align-items: center; gap: 6px;
