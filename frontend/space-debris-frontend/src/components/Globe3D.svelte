@@ -185,25 +185,27 @@
   .wrap { position: relative; width: 100%; height: 100%; }
   canvas { width: 100%; height: 100%; display: block; cursor: none; }
 
-  .tooltip {
-    position: absolute; pointer-events: none;
-    background: rgba(15,23,42,0.95);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 10px 12px;
-    backdrop-filter: blur(10px);
-    min-width: 140px; z-index: 100;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  }
+ .tooltip {
+  position: absolute; pointer-events: none;
+  background: rgba(0,0,0,0.92);
+  border: 1px solid #2b2b2b;
+  padding: 10px 12px;
+  min-width: 140px; z-index: 100;
+}
 
-  .tt-name {
-    font-size: 12px; font-weight: 600; color: #f8fafc;
-    margin-bottom: 7px; letter-spacing: 0.02em;
-  }
+.tt-name {
+  font-family: 'Inter';
+  font-size: 11px; font-weight: 500; color: #ffffff;
+  margin-bottom: 7px; letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 
-  .tt-row {
-    display: flex; justify-content: space-between;
-    font-size: 11px; color: #94a3b8; margin-top: 4px;
-  }
+.tt-row {
+  display: flex; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px; color: #888888; margin-top: 4px;
+  letter-spacing: 0.06em;
+}
 
-  .tt-risk { font-weight: 600; }
+.tt-risk { font-weight: 500; color: #ffffff !important; }
 </style>
