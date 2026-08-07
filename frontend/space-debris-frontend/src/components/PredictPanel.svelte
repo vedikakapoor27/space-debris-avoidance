@@ -266,7 +266,7 @@
   }
 
   .risk-num {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 32px; font-weight: 700;
     color: var(--text); line-height: 1;
   }
@@ -279,7 +279,7 @@
   }
 
   .risk-badge {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 11px; font-weight: 600;
     letter-spacing: 0.2em; padding: 5px 20px;
     border: 1px solid var(--border2); color: var(--text);
@@ -287,7 +287,7 @@
   }
 
   .risk-msg {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 9px; color: var(--text-4);
     text-align: center; line-height: 1.6; letter-spacing: 0.04em;
   }

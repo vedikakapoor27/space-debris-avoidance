@@ -188,7 +188,7 @@
   }
 
   .stat-val {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 28px; font-weight: 700;
     color: var(--text);
     line-height: 1; margin-bottom: 5px;
