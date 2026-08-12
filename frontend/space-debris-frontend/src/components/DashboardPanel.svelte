@@ -157,7 +157,7 @@
 
   .dp-live {
     display: flex; align-items: center; gap: 6px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-3);
     letter-spacing: 0.16em; text-transform: uppercase;
     border: 1px solid var(--border);
@@ -294,7 +294,7 @@
   }
 
   .clear-btn {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-4); background: none;
     border: 1px solid var(--border); padding: 3px 8px;
     cursor: none; transition: all 0.2s; letter-spacing: 0.08em;
