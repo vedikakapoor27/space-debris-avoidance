@@ -163,14 +163,14 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
   .sys-text {
-    font-family: 'Inter', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 8px; font-weight: 500;
     color: var(--text-3); letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
   .nav-group-label {
-    font-family: 'Inter', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 8px; color: var(--text-4);
     letter-spacing: 0.18em; text-transform: uppercase;
     padding: 12px 14px 5px;
@@ -223,7 +223,7 @@
   }
 
   .nav-sub {
-    font-family: 'Inter', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 8px; opacity: 0.5; line-height: 1;
     letter-spacing: 0.06em;
   }
@@ -257,14 +257,14 @@
   .fval.success { color: var(--text-3); }
 
   .fkey {
-    font-family: 'Inter', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 7px; color: var(--text-4);
     margin-top: 3px; letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .footer-version {
-    font-family: 'Inter', monospace;
+    font-family: 'IBM Plex Mono', monospace;
     font-size: 8px; color: var(--text-4);
     text-align: center; letter-spacing: 0.08em;
   }
