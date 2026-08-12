@@ -279,13 +279,13 @@
   }
 
   .hp-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 9px; color: var(--text-dim);
     letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 8px;
   }
 
   .hp-title {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 24px; font-weight: 800; color: var(--text);
     line-height: 1.15; letter-spacing: -0.01em;
   }
@@ -293,7 +293,7 @@
   .hp-actions { display: flex; gap: 8px; align-items: flex-start; margin-top: 4px; }
 
   .act-btn {
-    font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 600;
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600;
     letter-spacing: 0.08em; padding: 7px 14px; cursor: pointer;
     background: transparent; border: 1px solid; transition: all 0.2s;
   }
@@ -305,7 +305,7 @@
   .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border-dim); }
 
   .tab {
-    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
     letter-spacing: 0.06em; padding: 10px 20px;
     background: none; border: none; cursor: pointer;
     color: var(--text-dim); border-bottom: 2px solid transparent;
@@ -317,13 +317,13 @@
 
   .tab-count {
     background: var(--accent); color: white;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; padding: 1px 6px; border-radius: 10px;
   }
 
   .loading {
     display: flex; align-items: center; gap: 8px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 11px; color: var(--text-dim);
     padding: 40px; justify-content: center;
   }
@@ -336,7 +336,7 @@
     padding: 60px; opacity: 0.25;
   }
   .empty-ico { font-size: 44px; color: var(--accent); }
-  .empty p   { font-family: 'Syne', sans-serif; font-size: 13px; color: var(--text-dim); margin: 0; }
+  .empty p   { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dim); margin: 0; }
   .empty-s   { font-size: 11px !important; }
 
   /* STATS */
@@ -351,11 +351,11 @@
   .top-stat:hover { border-color: var(--border); }
 
   .ts-val {
-    font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800;
+    font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800;
     color: var(--accent-hi); line-height: 1; margin-bottom: 6px;
   }
   .ts-key {
-    font-family: 'JetBrains Mono', monospace; font-size: 8px;
+    font-family: 'Inter', monospace; font-size: 8px;
     color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase;
   }
 
@@ -367,11 +367,11 @@
     background: var(--glass);
   }
   .section-title {
-    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700;
+    font-family: 'Inter' sans-serif; font-size: 11px; font-weight: 700;
     color: var(--accent-hi); letter-spacing: 0.08em; text-transform: uppercase;
   }
   .section-time {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim);
+    font-family: 'Inter', monospace; font-size: 9px; color: var(--text-dim);
   }
 
   .dist-wrap { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -382,7 +382,7 @@
   }
   .db-seg {
     display: flex; align-items: center; justify-content: center;
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: white;
+    font-family: 'Inter', monospace; font-size: 9px; color: white;
     transition: width 0.8s ease; font-weight: 500;
   }
   .db-seg.high { background: var(--danger); }
@@ -391,7 +391,7 @@
 
   .dist-legend { display: flex; gap: 16px; }
   .dl-item {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em;
+    font-family: 'Inter', monospace; font-size: 9px; letter-spacing: 0.1em;
   }
   .dl-item.high { color: var(--danger); }
   .dl-item.med  { color: var(--warning); }
@@ -406,11 +406,11 @@
   .prob-card:last-child { border-right: none; }
 
   .prob-val {
-    font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800;
+    font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 800;
     line-height: 1; margin-bottom: 6px;
   }
   .prob-key {
-    font-family: 'JetBrains Mono', monospace; font-size: 8px;
+    font-family: 'Inter', monospace; font-size: 8px;
     color: var(--text-dim); letter-spacing: 0.14em; text-transform: uppercase;
   }
 
@@ -435,13 +435,13 @@
   .latest-risk { display: flex; align-items: center; gap: 12px; }
 
   .latest-prob {
-    font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+    font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800;
     color: var(--text);
   }
 
   .latest-inputs {
     display: flex; gap: 14px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 10px; color: var(--text-dim);
   }
 
@@ -464,11 +464,11 @@
   .he-d    { font-family: 'JetBrains Mono', monospace; font-size: 8px; color: var(--text-dim); }
 
   .he-prob {
-    font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--text);
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: var(--text);
   }
 
   .conf-badge {
-    font-family: 'JetBrains Mono', monospace; font-size: 8px;
+    font-family: 'Inter', monospace; font-size: 8px;
     padding: 2px 7px; letter-spacing: 0.1em; text-transform: uppercase;
   }
   .conf-high   { background: rgba(0,232,160,0.1);  color: var(--safe);    border: 1px solid rgba(0,232,160,0.2); }
@@ -477,15 +477,15 @@
 
   .he-inputs {
     display: flex; gap: 8px; flex-wrap: wrap;
-    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim);
+    font-family: 'Inter', monospace; font-size: 9px; color: var(--text-dim);
   }
 
   .he-action {
-    font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 600; color: var(--text-dim);
+    font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 600; color: var(--text-dim);
   }
 
   .he-urgency {
-    font-family: 'JetBrains Mono', monospace; font-size: 9px;
+    font-family: 'Inter', monospace; font-size: 9px;
     letter-spacing: 0.12em; text-align: right; text-transform: uppercase;
   }
   .urgency-high { color: var(--danger); }
@@ -493,7 +493,7 @@
   .urgency-low  { color: var(--safe); }
 
   .pill {
-    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-family: 'Inter', sans-serif; font-weight: 700;
     font-size: 9px; letter-spacing: 0.08em; padding: 3px 9px;
     text-transform: uppercase;
   }
