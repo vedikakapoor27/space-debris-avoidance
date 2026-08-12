@@ -288,7 +288,7 @@
   }
 
   .breadcrumb {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 11px; font-weight: 600;
     color: var(--text-3); letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -350,7 +350,7 @@
     width: 28px; height: 28px;
     border: 1px solid var(--border2);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 10px; font-weight: 500; color: var(--text-2);
     cursor: none; letter-spacing: 0.05em;
   }
@@ -402,7 +402,7 @@
 
   .leg-item {
     display: flex; align-items: center; gap: 7px;
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; color: rgba(168,168,168,0.8);
     letter-spacing: 0.1em; text-transform: uppercase;
   }
