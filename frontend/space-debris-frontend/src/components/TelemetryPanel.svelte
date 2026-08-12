@@ -83,20 +83,20 @@
   .panel-header { display: flex; justify-content: space-between; align-items: flex-start; }
 
   .header-eyebrow {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 9px; color: var(--text-dim);
     letter-spacing: 0.22em; text-transform: uppercase; margin-bottom: 6px;
   }
 
   .header-title {
-    font-family: 'Limelight', cursive;
+    font-family: 'Inter', cursive;
     font-size: 22px; color: var(--text);
     letter-spacing: 0.04em; line-height: 1.15; font-weight: 400;
   }
 
   .polling-badge {
     display: flex; align-items: center; gap: 7px;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 9px; color: var(--violet);
     letter-spacing: 0.14em;
     border: 1px solid rgba(192,132,252,0.22);
@@ -128,12 +128,12 @@
   @keyframes slideIn { from{opacity:0;transform:translateX(-10px)} to{opacity:1;transform:translateX(0)} }
 
   .entry-time {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 10px; color: var(--text-dim);
   }
 
   .entry-obj {
-    font-family: 'Space Grotesk', monospace;
+    font-family: 'Inter', monospace;
     font-size: 11px; font-weight: 600; color: var(--gold);
   }
 
@@ -144,12 +144,12 @@
   }
 
   .entry-prob {
-    font-family: 'Limelight', cursive;
+    font-family: 'Inter', cursive;
     font-size: 13px; color: var(--text); text-align: center;
   }
 
   .pill {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; letter-spacing: 0.1em; padding: 2px 7px; text-align: center;
   }
   .pill.high { background: rgba(255,56,96,0.1);  color: var(--danger);  border: 1px solid rgba(255,56,96,0.25); }
@@ -157,7 +157,7 @@
   .pill.low  { background: rgba(0,232,160,0.07); color: var(--safe);    border: 1px solid rgba(0,232,160,0.2); }
 
   .entry-action {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 9px; color: var(--text-dim);
   }
 
