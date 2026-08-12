@@ -148,7 +148,7 @@
   }
 
   .pp-title {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 20px; font-weight: 700; color: var(--text);
     line-height: 1.2; letter-spacing: -0.01em; text-transform: uppercase;
   }
@@ -185,7 +185,7 @@
   }
 
   .field-val {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 13px; font-weight: 500; color: var(--text);
   }
   .field-unit { font-weight: 300; font-size: 9px; color: var(--text-4); }
@@ -221,7 +221,7 @@
   .sc-btn {
     flex: 1; padding: 7px;
     background: transparent; border: 1px solid var(--border);
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Inter', monospace;
     font-size: 8px; letter-spacing: 0.1em;
     cursor: none; transition: all 0.15s;
     text-transform: uppercase; color: var(--text-3);
@@ -245,7 +245,7 @@
 
   .err {
     background: var(--danger-bg); border: 1px solid var(--border);
-    padding: 8px 10px; font-family: 'IBM Plex Mono', monospace;
+    padding: 8px 10px; font-family: 'Inter', monospace;
     font-size: 8px; color: var(--text-2); letter-spacing: 0.06em;
   }
 
