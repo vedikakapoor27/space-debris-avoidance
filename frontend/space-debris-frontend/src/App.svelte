@@ -30,8 +30,7 @@
 
     return () => {
       clearInterval(id)
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseover', over)
+
     }
   })
 
@@ -324,7 +323,6 @@
     color: var(--text-3); padding: 4px 10px; height: 28px;
     background: transparent;
     border: 1px solid var(--border);
-    cursor: none; transition: all 0.2s;
     letter-spacing: 0.1em; text-transform: uppercase;
   }
 
@@ -342,7 +340,6 @@
     border: 1px solid var(--border);
     color: var(--text-3); font-size: 13px;
     display: flex; align-items: center; justify-content: center;
-    cursor: none; transition: all 0.2s;
   }
   .theme-btn:hover { border-color: var(--border2); color: var(--text); }
 
@@ -352,7 +349,6 @@
     display: flex; align-items: center; justify-content: center;
     font-family: 'Inter', monospace;
     font-size: 10px; font-weight: 500; color: var(--text-2);
-    cursor: none; letter-spacing: 0.05em;
   }
 
   /* ── BODY ── */
@@ -484,4 +480,5 @@
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
+cursor: auto !important;
 </style>
