@@ -480,5 +480,7 @@
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
-cursor: auto !important;
+:global(*) {
+  cursor: auto !important;
+}
 </style>
