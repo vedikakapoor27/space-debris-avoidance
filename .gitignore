@@ -1,19 +1,63 @@
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
 .venv/
-instance/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Environment variables
+# Environment / secrets — never commit real env files
 .env
+.env.*
+.env.local
+.env.development
+.env.production
+.env.staging
+*.env
+!.env.example
+!.env.*.example
 
 # Node
 node_modules/
 dist/
+.npm/
+*.tsbuildinfo
 
-# VS Code
+# Editor / IDE
 .vscode/
+.idea/
+*.swp
+*.swo
 
 # OS files
 .DS_Store
 Thumbs.db
+Desktop.ini
+
+# Database / local runtime data
+*.db
+*.sqlite
+*.sqlite3
+instance/
+Backend/ml/instance/
+**/instance/
+
+# Logs & temp
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# Local ML / runtime artifacts (keep models you intentionally track)
+# Uncomment if you don't want local DB dumps or history files pushed:
+# Backend/ml/prediction_history.json
+# Backend/ml/astraeus.db
+
+# Docker
+docker-compose.override.yml

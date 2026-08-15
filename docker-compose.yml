@@ -1,38 +1,64 @@
-version: '3.8'
-
-services:
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: astraeus
-      POSTGRES_PASSWORD: astraeus123
-      POSTGRES_DB: astraeus_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  backend:
-    build: ./Backend/ml
-    ports:
-      - "5000:5000"
-    environment:
-      FLASK_ENV: production
-      DATABASE_URL: postgresql://astraeus:astraeus123@db:5432/astraeus_db
-      SECRET_KEY: change-this-in-production
-      JWT_SECRET_KEY: change-this-jwt-key
-      CORS_ORIGINS: http://localhost:5173,https://your-frontend.vercel.app
-    depends_on:
-      - db
-    volumes:
-      - ./Backend/ml:/app
-
-  frontend:
-    build: ./frontend/space-debris-frontend
-    ports:
-      - "5173:80"
-    depends_on:
-      - backend
-
-volumes:
-  postgres_data:
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-astraeus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-astraeus123}
+      POSTGRES_DB: ${POSTGRES_DB:-astraeus_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-astraeus} -d ${POSTGRES_DB:-astraeus_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./Backend/ml
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-astraeus}:${POSTGRES_PASSWORD:-astraeus123}@db:5432/${POSTGRES_DB:-astraeus_db}
+      RATELIMIT_STORAGE_URI: redis://redis:6379/0
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:80}
+      SECRET_KEY: ${SECRET_KEY:-change-this-in-production}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-change-this-jwt-key}
+      MODEL_PATH: ${MODEL_PATH:-collision_model.pkl}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./Backend/ml:/app
+
+  frontend:
+    build:
+      context: ./frontend/space-debris-frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000}
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+

@@ -8,6 +8,7 @@ from flask_limiter.util import get_remote_address
 from dotenv import load_dotenv
 import joblib
 from datetime import datetime
+from sqlalchemy import text
 
 from config import config
 from models import db, Prediction, ConjunctionEvent, User
@@ -30,11 +31,14 @@ def create_app(config_name=None):
     JWTManager(app)
     CORS(app, origins=app.config['CORS_ORIGINS'])
 
-    # Rate limiter
+    raw_limits = app.config.get('RATELIMIT_DEFAULT', '1000 per day;300 per hour')
+    default_limits = [part.strip() for part in raw_limits.replace(',', ';').split(';') if part.strip()]
+
     limiter = Limiter(
         app=app,
         key_func=get_remote_address,
-        default_limits=['200 per day', '50 per hour']
+        default_limits=default_limits,
+        storage_uri=app.config.get('RATELIMIT_STORAGE_URI', 'memory://'),
     )
 
     # Register blueprints
@@ -68,13 +72,24 @@ def create_app(config_name=None):
         })
 
     @app.route('/health', methods=['GET'])
+    @limiter.exempt
     def health():
+        db_status = 'disconnected'
+        try:
+            db.session.execute(text('SELECT 1'))
+            db_status = 'connected'
+        except Exception as exc:
+            db_status = f'error: {exc.__class__.__name__}'
+
+        model_status = 'loaded' if model is not None else 'missing'
+        healthy = db_status == 'connected' and model_status == 'loaded'
+
         return jsonify({
-            'status':    'OK',
+            'status':    'OK' if healthy else 'DEGRADED',
             'timestamp': datetime.utcnow().isoformat(),
-            'model':     'loaded',
-            'database':  'connected'
-        })
+            'model':     model_status,
+            'database':  db_status,
+        }), 200 if healthy else 503
 
     @app.route('/predict', methods=['POST'])
     @limiter.limit('30 per minute')
@@ -243,4 +258,6 @@ def create_app(config_name=None):
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    # Local only. Prefer: gunicorn --bind 0.0.0.0:5000 --workers 2 app:app
+    debug = os.environ.get('FLASK_ENV', 'development') != 'production'
+    app.run(host='0.0.0.0', debug=debug, port=int(os.environ.get('PORT', 5000)))

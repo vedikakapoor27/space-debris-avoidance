@@ -1,13 +1,19 @@
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
+export function apiUrl(path = '') {
+  const base = BASE_URL.replace(/\/$/, '')
+  const suffix = path.startsWith('/') ? path : `/${path}`
+  return `${base}${suffix}`
+}
 
 export async function checkHealth() {
-  const res = await fetch(`${BASE_URL}/health`)
+  const res = await fetch(apiUrl('/health'))
   if (!res.ok) throw new Error('Backend offline')
   return res.json()
 }
 
 export async function predict({ distance_km, rel_velocity, approach_rate }) {
-  const res = await fetch(`${BASE_URL}/predict`, {
+  const res = await fetch(apiUrl('/predict'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ distance_km, rel_velocity, approach_rate })
@@ -15,6 +21,24 @@ export async function predict({ distance_km, rel_velocity, approach_rate }) {
   const data = await res.json()
   if (data.status === 'error') throw new Error(data.message)
   return data
+}
+
+export async function getStats() {
+  const res = await fetch(apiUrl('/stats'))
+  if (!res.ok) throw new Error('Failed to load stats')
+  return res.json()
+}
+
+export async function getHistory(limit = 50) {
+  const res = await fetch(apiUrl(`/history?limit=${limit}`))
+  if (!res.ok) throw new Error('Failed to load history')
+  return res.json()
+}
+
+export async function clearHistory() {
+  const res = await fetch(apiUrl('/history/clear'), { method: 'DELETE' })
+  if (!res.ok) throw new Error('Failed to clear history')
+  return res.json()
 }
 
 export function generateDebrisField(count = 80) {

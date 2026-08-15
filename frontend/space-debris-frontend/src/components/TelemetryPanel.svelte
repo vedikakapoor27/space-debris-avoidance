@@ -25,7 +25,7 @@
           input: { distance_km: d, rel_velocity: v, approach_rate: a }
         })
       }
-    }, 4000)
+    }, 15000)
   })
   onDestroy(() => clearInterval(interval))
 

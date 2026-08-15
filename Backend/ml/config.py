@@ -3,36 +3,36 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Config:
-    # Flask
     SECRET_KEY = os.environ.get('SECRET_KEY', 'astraeus-dev-secret-change-in-production')
     DEBUG = False
     TESTING = False
 
-    # Database
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'sqlite:///astraeus.db'   # fallback for local dev
+        'sqlite:///astraeus.db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
-        'pool_recycle':  300,
+        'pool_recycle': 300,
     }
 
-    # JWT
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'astraeus-jwt-secret-change-in-production')
-    JWT_ACCESS_TOKEN_EXPIRES  = 3600   # 1 hour
-    JWT_REFRESH_TOKEN_EXPIRES = 86400  # 24 hours
+    JWT_ACCESS_TOKEN_EXPIRES = 3600
+    JWT_REFRESH_TOKEN_EXPIRES = 86400
 
-    # Rate limiting
-    RATELIMIT_DEFAULT          = '200 per day, 50 per hour'
-    RATELIMIT_STORAGE_URL      = 'memory://'
+    # Dashboard polls /history + /stats; keep room for that while still capping abuse.
+    RATELIMIT_DEFAULT = os.environ.get('RATELIMIT_DEFAULT', '1000 per day;300 per hour')
+    RATELIMIT_STORAGE_URI = os.environ.get('RATELIMIT_STORAGE_URI', 'memory://')
 
-    # CORS
-    CORS_ORIGINS = os.environ.get('CORS_ORIGINS', 'http://localhost:5173').split(',')
+    CORS_ORIGINS = [
+        o.strip()
+        for o in os.environ.get('CORS_ORIGINS', 'http://localhost:5173').split(',')
+        if o.strip()
+    ]
 
-    # ML Model
     MODEL_PATH = os.environ.get('MODEL_PATH', 'collision_model.pkl')
 
 
@@ -42,19 +42,25 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '').replace(
-        'postgres://', 'postgresql://'   # Railway fix
-    )
+
+    @staticmethod
+    def init_uri():
+        uri = os.environ.get('DATABASE_URL', '')
+        return uri.replace('postgres://', 'postgresql://') if uri else 'sqlite:///astraeus.db'
+
+
+ProductionConfig.SQLALCHEMY_DATABASE_URI = ProductionConfig.init_uri()
 
 
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    RATELIMIT_STORAGE_URI = 'memory://'
 
 
 config = {
     'development': DevelopmentConfig,
-    'production':  ProductionConfig,
-    'testing':     TestingConfig,
-    'default':     DevelopmentConfig,
+    'production': ProductionConfig,
+    'testing': TestingConfig,
+    'default': DevelopmentConfig,
 }

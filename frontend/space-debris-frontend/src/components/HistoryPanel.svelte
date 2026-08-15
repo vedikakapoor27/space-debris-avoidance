@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte'
   import { fly, fade } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
+  import { getStats, getHistory, clearHistory as clearHistoryApi } from '../utils/api.js'
 
   let stats = null
   let history = []
@@ -11,22 +12,20 @@
 
   async function fetchStats() {
     try {
-      const res = await fetch('http://localhost:5000/stats')
-      stats = await res.json()
+      stats = await getStats()
     } catch { stats = null }
   }
 
   async function fetchHistory() {
     try {
-      const res = await fetch('http://localhost:5000/history?limit=50')
-      const data = await res.json()
+      const data = await getHistory(50)
       history = data.history || []
     } catch { history = [] }
   }
 
   async function clearHistory() {
     try {
-      await fetch('http://localhost:5000/history/clear', { method: 'DELETE' })
+      await clearHistoryApi()
       history = []
       await fetchStats()
     } catch {}
@@ -62,7 +61,7 @@
 
   onMount(() => {
     load()
-    interval = setInterval(load, 10000)
+    interval = setInterval(load, 30000)
   })
   onDestroy(() => clearInterval(interval))
 
