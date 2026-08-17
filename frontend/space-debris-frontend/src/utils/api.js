@@ -1,3 +1,5 @@
+import { getAccessToken, getRefreshToken, setSession, clearSession } from '../stores/authStore.js'
+
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
 
 export function apiUrl(path = '') {
@@ -6,17 +8,102 @@ export function apiUrl(path = '') {
   return `${base}${suffix}`
 }
 
+async function parseJson(res) {
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok) {
+    throw new Error(data.message || `Request failed (${res.status})`)
+  }
+  return data
+}
+
+export async function refreshAccessToken() {
+  const refreshToken = getRefreshToken()
+  if (!refreshToken) throw new Error('No refresh token')
+
+  const res = await fetch(apiUrl('/auth/refresh'), {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${refreshToken}` },
+  })
+  const data = await parseJson(res)
+
+  const current = JSON.parse(localStorage.getItem('astraeus_user') || 'null')
+  setSession({
+    user: current,
+    access_token: data.access_token,
+    refresh_token: refreshToken,
+  })
+  return data.access_token
+}
+
+export async function authFetch(path, options = {}) {
+  const token = getAccessToken()
+  const headers = {
+    ...options.headers,
+  }
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = headers['Content-Type'] || 'application/json'
+  }
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`
+  }
+
+  let res = await fetch(apiUrl(path), { ...options, headers })
+
+  if (res.status === 401 && getRefreshToken()) {
+    try {
+      const newToken = await refreshAccessToken()
+      headers.Authorization = `Bearer ${newToken}`
+      res = await fetch(apiUrl(path), { ...options, headers })
+    } catch {
+      clearSession()
+      throw new Error('Session expired. Please log in again.')
+    }
+  }
+
+  return res
+}
+
 export async function checkHealth() {
   const res = await fetch(apiUrl('/health'))
   if (!res.ok) throw new Error('Backend offline')
   return res.json()
 }
 
-export async function predict({ distance_km, rel_velocity, approach_rate }) {
-  const res = await fetch(apiUrl('/predict'), {
+export async function login({ username, password }) {
+  const res = await fetch(apiUrl('/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ distance_km, rel_velocity, approach_rate })
+    body: JSON.stringify({ username, password }),
+  })
+  const data = await parseJson(res)
+  setSession(data)
+  return data
+}
+
+export async function register({ username, email, password }) {
+  const res = await fetch(apiUrl('/auth/register'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, email, password }),
+  })
+  const data = await parseJson(res)
+  setSession(data)
+  return data
+}
+
+export async function getMe(token) {
+  const res = await fetch(apiUrl('/auth/me'), {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  return parseJson(res)
+}
+
+export async function predict({ distance_km, rel_velocity, approach_rate }) {
+  const res = await authFetch('/predict', {
+    method: 'POST',
+    body: JSON.stringify({ distance_km, rel_velocity, approach_rate }),
   })
   const data = await res.json()
   if (data.status === 'error') throw new Error(data.message)
@@ -24,21 +111,18 @@ export async function predict({ distance_km, rel_velocity, approach_rate }) {
 }
 
 export async function getStats() {
-  const res = await fetch(apiUrl('/stats'))
-  if (!res.ok) throw new Error('Failed to load stats')
-  return res.json()
+  const res = await authFetch('/stats')
+  return parseJson(res)
 }
 
 export async function getHistory(limit = 50) {
-  const res = await fetch(apiUrl(`/history?limit=${limit}`))
-  if (!res.ok) throw new Error('Failed to load history')
-  return res.json()
+  const res = await authFetch(`/history?limit=${limit}`)
+  return parseJson(res)
 }
 
 export async function clearHistory() {
-  const res = await fetch(apiUrl('/history/clear'), { method: 'DELETE' })
-  if (!res.ok) throw new Error('Failed to clear history')
-  return res.json()
+  const res = await authFetch('/history/clear', { method: 'DELETE' })
+  return parseJson(res)
 }
 
 export function generateDebrisField(count = 80) {

@@ -93,8 +93,10 @@ def create_app(config_name=None):
 
     @app.route('/predict', methods=['POST'])
     @limiter.limit('30 per minute')
+    @jwt_required()
     def predict():
         try:
+            user_id       = get_jwt_identity()
             data          = request.get_json()
             distance_km   = float(data['distance_km'])
             rel_velocity  = float(data['rel_velocity'])
@@ -124,6 +126,7 @@ def create_app(config_name=None):
                 fuel_cost_kg  = result['fuel_cost_kg'],
                 time_window   = result['time_window'],
                 urgency       = result['urgency'],
+                user_id       = user_id,
             )
             db.session.add(prediction)
             db.session.commit()
@@ -156,6 +159,7 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/history', methods=['GET'])
+    @jwt_required()
     def history():
         try:
             limit     = int(request.args.get('limit', 50))
@@ -182,6 +186,7 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/history/clear', methods=['DELETE'])
+    @jwt_required()
     def clear_history():
         try:
             Prediction.query.delete()
@@ -192,6 +197,7 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/stats', methods=['GET'])
+    @jwt_required()
     def stats():
         try:
             total  = Prediction.query.count()

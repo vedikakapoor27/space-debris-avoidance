@@ -9,13 +9,18 @@
   import ConjunctionsPanel from './components/ConjunctionsPanel.svelte'
   import TelemetryPanel from './components/TelemetryPanel.svelte'
   import HistoryPanel from './components/HistoryPanel.svelte'
+  import AuthScreen from './components/AuthScreen.svelte'
   import { activePanel, backendOnline, globeRotating } from './stores/appStore.js'
-  import { checkHealth } from './utils/api.js'
+  import { authStore, initAuth, clearSession } from './stores/authStore.js'
+  import { checkHealth, getMe } from './utils/api.js'
   import { theme } from './stores/appStore.js'
 
   let clockStr = '--:--:--'
+  let showUserMenu = false
 
   onMount(async () => {
+    await initAuth((token) => getMe(token))
+
     const tick = () => {
       const n = new Date()
       clockStr = n.toUTCString().split(' ')[4]
@@ -26,13 +31,24 @@
     try { await checkHealth(); backendOnline.set(true) }
     catch { backendOnline.set(false) }
 
-  
-
     return () => {
       clearInterval(id)
-
     }
   })
+
+  function logout() {
+    clearSession()
+    showUserMenu = false
+  }
+
+  function handleWindowClick() {
+    showUserMenu = false
+  }
+
+  function userInitials(user) {
+    if (!user?.username) return 'OP'
+    return user.username.slice(0, 2).toUpperCase()
+  }
 
   const panelLabels = {
     dashboard:    'Dashboard',
@@ -43,8 +59,16 @@
   }
 </script>
 
+{#if $authStore.loading}
+  <div class="boot-screen" data-theme={$theme}>
+    <div class="boot-text">INITIALIZING ASTRAEUS...</div>
+  </div>
+{:else if !$authStore.isAuthenticated}
+  <AuthScreen />
+{:else}
+<svelte:window on:click={handleWindowClick} />
 
-<div class="app" data-theme={$theme}>
+<div class="app" data-theme={$theme} on:click|stopPropagation>
   <Sidebar />
 
   <div class="main">
@@ -92,7 +116,18 @@
     </svg>
   {/if}
 </button>
-  <div class="avatar hoverable">SD</div>
+  <div class="avatar-wrap" on:click|stopPropagation>
+    <button class="avatar hoverable" on:click={() => showUserMenu = !showUserMenu}>
+      {userInitials($authStore.user)}
+    </button>
+    {#if showUserMenu}
+      <div class="user-menu" transition:fade={{ duration: 120 }}>
+        <div class="user-name">{$authStore.user?.username}</div>
+        <div class="user-role">{$authStore.user?.role}</div>
+        <button class="logout-btn" on:click={logout}>Sign Out</button>
+      </div>
+    {/if}
+  </div>
 </div>
     </header>
 
@@ -135,8 +170,75 @@
     </div>
   </div>
 </div>
+{/if}
 
 <style>
+  .boot-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+  }
+
+  .boot-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--text-4);
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  .avatar-wrap {
+    position: relative;
+  }
+
+  .user-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 160px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    padding: 12px;
+    z-index: 100;
+  }
+
+  .user-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .user-role {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    color: var(--text-4);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin: 4px 0 10px;
+  }
+
+  .logout-btn {
+    width: 100%;
+    height: 30px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-3);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .logout-btn:hover {
+    border-color: var(--border2);
+    color: var(--text);
+  }
+
   /* ══════════════════════════════════
      DARK THEME — matte black
   ══════════════════════════════════ */
@@ -349,6 +451,8 @@
     display: flex; align-items: center; justify-content: center;
     font-family: 'Inter', monospace;
     font-size: 10px; font-weight: 500; color: var(--text-2);
+    background: transparent;
+    cursor: pointer;
   }
 
   /* ── BODY ── */
