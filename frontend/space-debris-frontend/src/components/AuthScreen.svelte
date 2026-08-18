@@ -90,7 +90,7 @@
       <p class="auth-desc">
         {mode === 'login'
           ? 'Authenticate to access orbital tracking, risk analysis, and telemetry.'
-          : 'Register as an operator to run predictions and view mission history.'}
+          : 'First account becomes admin. New accounts start as viewers until promoted.'}
       </p>
 
       <form class="auth-form" on:submit|preventDefault={handleSubmit}>

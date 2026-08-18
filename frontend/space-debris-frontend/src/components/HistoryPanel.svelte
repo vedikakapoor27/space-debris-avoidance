@@ -3,12 +3,18 @@
   import { fly, fade } from 'svelte/transition'
   import { cubicOut } from 'svelte/easing'
   import { getStats, getHistory, clearHistory as clearHistoryApi } from '../utils/api.js'
+  import { authStore } from '../stores/authStore.js'
+  import { canClearHistory, canViewFullHistory } from '../utils/permissions.js'
 
   let stats = null
   let history = []
   let loading = true
   let activeTab = 'stats'
   let interval
+  let scope = 'all'
+
+  $: role = $authStore.user?.role || 'viewer'
+  $: showClear = canClearHistory(role)
 
   async function fetchStats() {
     try {
@@ -20,6 +26,7 @@
     try {
       const data = await getHistory(50)
       history = data.history || []
+      scope = data.scope || 'all'
     } catch { history = [] }
   }
 
@@ -81,11 +88,17 @@
       <button class="act-btn export" on:click={exportCSV} disabled={!history.length}>
         ↓ Export CSV
       </button>
-      <button class="act-btn clear" on:click={clearHistory} disabled={!history.length}>
-        ✕ Clear
-      </button>
+      {#if showClear}
+        <button class="act-btn clear" on:click={clearHistory} disabled={!history.length}>
+          ✕ Clear
+        </button>
+      {/if}
     </div>
   </div>
+
+  {#if !canViewFullHistory(role)}
+    <div class="scope-note">Showing your predictions only</div>
+  {/if}
 
   <!-- TABS -->
   <div class="tabs">
@@ -275,6 +288,17 @@
 
   .hp-header {
     display: flex; justify-content: space-between; align-items: flex-start;
+  }
+
+  .scope-note {
+    margin-top: -8px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-4);
   }
 
   .hp-eyebrow {

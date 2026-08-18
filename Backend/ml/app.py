@@ -1,7 +1,7 @@
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -13,6 +13,8 @@ from sqlalchemy import text
 from config import config
 from models import db, Prediction, ConjunctionEvent, User
 from auth import auth_bp
+from admin import admin_bp
+from roles import role_required, get_current_user, predictions_for_user
 from risk_scorer import score_from_features
 from avoidance import full_assessment
 
@@ -43,6 +45,7 @@ def create_app(config_name=None):
 
     # Register blueprints
     app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
 
     # Load ML model
     model_path = app.config['MODEL_PATH']
@@ -68,6 +71,7 @@ def create_app(config_name=None):
                 '/auth/register':   'POST - create account',
                 '/auth/login':      'POST - login',
                 '/auth/me':         'GET  - current user',
+                '/admin/users':     'GET  - list users (admin)',
             }
         })
 
@@ -93,10 +97,10 @@ def create_app(config_name=None):
 
     @app.route('/predict', methods=['POST'])
     @limiter.limit('30 per minute')
-    @jwt_required()
-    def predict():
+    @role_required('operator', 'admin')
+    def predict(current_user):
         try:
-            user_id       = get_jwt_identity()
+            user_id       = current_user.id
             data          = request.get_json()
             distance_km   = float(data['distance_km'])
             rel_velocity  = float(data['rel_velocity'])
@@ -159,14 +163,15 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/history', methods=['GET'])
-    @jwt_required()
-    def history():
+    @role_required('viewer', 'operator', 'admin')
+    def history(current_user):
         try:
             limit     = int(request.args.get('limit', 50))
             risk      = request.args.get('risk', None)
             page      = int(request.args.get('page', 1))
 
-            query = Prediction.query.order_by(Prediction.timestamp.desc())
+            query = predictions_for_user(current_user)
+            query = query.order_by(Prediction.timestamp.desc())
 
             if risk:
                 query = query.filter_by(risk_level=risk.upper())
@@ -179,6 +184,7 @@ def create_app(config_name=None):
                 'total':   total,
                 'page':    page,
                 'limit':   limit,
+                'scope':   'own' if current_user.role == 'viewer' else 'all',
                 'history': [p.to_dict() for p in items]
             })
 
@@ -186,8 +192,8 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/history/clear', methods=['DELETE'])
-    @jwt_required()
-    def clear_history():
+    @role_required('admin')
+    def clear_history(current_user):
         try:
             Prediction.query.delete()
             db.session.commit()
@@ -197,25 +203,28 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/stats', methods=['GET'])
-    @jwt_required()
-    def stats():
+    @role_required('viewer', 'operator', 'admin')
+    def stats(current_user):
         try:
-            total  = Prediction.query.count()
+            base_query = predictions_for_user(current_user)
+            total  = base_query.count()
 
             if total == 0:
                 return jsonify({'status': 'success', 'total_predictions': 0, 'message': 'No predictions yet'})
 
-            high   = Prediction.query.filter_by(risk_level='HIGH').count()
-            medium = Prediction.query.filter_by(risk_level='MEDIUM').count()
-            low    = Prediction.query.filter_by(risk_level='LOW').count()
+            high   = base_query.filter_by(risk_level='HIGH').count()
+            medium = base_query.filter_by(risk_level='MEDIUM').count()
+            low    = base_query.filter_by(risk_level='LOW').count()
 
-            probs  = [p.probability for p in Prediction.query.all()]
-            latest = Prediction.query.order_by(Prediction.timestamp.desc()).first()
+            items  = base_query.all()
+            probs  = [p.probability for p in items]
+            latest = base_query.order_by(Prediction.timestamp.desc()).first()
 
             high_pct = round((high / total) * 100, 1)
 
             return jsonify({
                 'status':            'success',
+                'scope':             'own' if current_user.role == 'viewer' else 'all',
                 'total_predictions': total,
                 'by_risk': {
                     'HIGH':   high,
@@ -240,7 +249,8 @@ def create_app(config_name=None):
             return jsonify({'status': 'error', 'message': str(e)}), 500
 
     @app.route('/conjunctions', methods=['GET'])
-    def conjunctions():
+    @role_required('viewer', 'operator', 'admin')
+    def conjunctions(current_user):
         try:
             events = ConjunctionEvent.query.order_by(
                 ConjunctionEvent.timestamp.desc()

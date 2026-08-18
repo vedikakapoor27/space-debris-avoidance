@@ -2,11 +2,19 @@
   import { onMount, onDestroy } from 'svelte'
   import { telemetryFeed, pushTelemetry } from '../stores/appStore.js'
   import { predict } from '../utils/api.js'
+  import { authStore } from '../stores/authStore.js'
+  import { canUseTelemetry } from '../utils/permissions.js'
+  import AccessDenied from './AccessDenied.svelte'
 
   let interval
   const objects = ['ISS', 'SAT-1001', 'SAT-1002', 'Starlink-12', 'CosmosSat-3']
 
+  $: role = $authStore.user?.role || 'viewer'
+  $: allowed = canUseTelemetry(role)
+
   onMount(() => {
+    if (!allowed) return
+
     interval = setInterval(async () => {
       const d = +(5 + Math.random() * 200).toFixed(1)
       const v = +(1 + Math.random() * 14).toFixed(1)
@@ -34,7 +42,13 @@
 </script>
 
 <div class="panel">
-
+  {#if !allowed}
+    <AccessDenied
+      title="Telemetry Locked"
+      message="Live telemetry polling requires operator or administrator access."
+      role={role}
+    />
+  {:else}
   <div class="panel-header">
     <div>
       <div class="header-eyebrow">LIVE DATA STREAM</div>
@@ -42,7 +56,7 @@
     </div>
     <div class="polling-badge">
       <span class="poll-dot"></span>
-      AUTO-POLLING · 4s
+      AUTO-POLLING · 15s
     </div>
   </div>
 
@@ -70,7 +84,7 @@
       {/each}
     {/if}
   </div>
-
+  {/if}
 </div>
 
 <style>

@@ -1,47 +1,60 @@
 <script>
   import { activePanel, alertCount } from '../stores/appStore.js'
+  import { authStore } from '../stores/authStore.js'
+  import { canAccessPanel } from '../utils/permissions.js'
 
- const navItems = [
-  { 
-    id: 'dashboard',
-    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+  const navItems = [
+    {
+      id: 'dashboard',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <circle cx="12" cy="12" r="3"/>
       <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
       <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>
     </svg>`,
-    label: 'Dashboard', sub: 'Overview'
-  },
-  {
-    id: 'predict',
-    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      label: 'Dashboard', sub: 'Overview'
+    },
+    {
+      id: 'predict',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
       <path d="M12 8v4l3 3"/>
     </svg>`,
-    label: 'Risk Predict', sub: 'AI Analysis'
-  },
-  {
-    id: 'conjunctions',
-    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      label: 'Risk Predict', sub: 'AI Analysis'
+    },
+    {
+      id: 'conjunctions',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
       <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
     </svg>`,
-    label: 'Conjunctions', sub: 'TCA Events'
-  },
-  {
-    id: 'telemetry',
-    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      label: 'Conjunctions', sub: 'TCA Events'
+    },
+    {
+      id: 'telemetry',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
     </svg>`,
-    label: 'Telemetry', sub: 'Live Feed'
-  },
-  {
-    id: 'history',
-    icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      label: 'Telemetry', sub: 'Live Feed'
+    },
+    {
+      id: 'history',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/>
     </svg>`,
-    label: 'History', sub: 'Analytics'
-  },
-]
+      label: 'History', sub: 'Analytics'
+    },
+    {
+      id: 'admin',
+      icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.6.77 1.05 1.41 1.15H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </svg>`,
+      label: 'Admin', sub: 'Users'
+    },
+  ]
+
+  $: role = $authStore.user?.role || 'viewer'
+  $: visibleItems = navItems.filter((item) => canAccessPanel(role, item.id))
 </script>
 
 <nav class="sidebar">
@@ -66,10 +79,12 @@
     <span class="sys-text">System Nominal</span>
   </div>
 
+  <div class="role-pill">{role}</div>
+
   <div class="nav-group-label">Navigation</div>
 
   <ul class="nav-list">
-    {#each navItems as item}
+    {#each visibleItems as item}
       <li>
         <button
           class="nav-item hoverable"
@@ -167,6 +182,18 @@
     font-size: 8px; font-weight: 500;
     color: var(--text-3); letter-spacing: 0.14em;
     text-transform: uppercase;
+  }
+
+  .role-pill {
+    margin: 8px 14px 0;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    text-align: center;
   }
 
   .nav-group-label {
@@ -268,4 +295,4 @@
     font-size: 8px; color: var(--text-4);
     text-align: center; letter-spacing: 0.08em;
   }
-</style> 
+</style>

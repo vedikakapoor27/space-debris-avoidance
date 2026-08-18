@@ -34,7 +34,7 @@ def register():
             username = username,
             email    = email,
             password = generate_password_hash(password),
-            role     = 'operator'
+            role     = 'admin' if User.query.count() == 0 else 'viewer',
         )
         db.session.add(user)
         db.session.commit()

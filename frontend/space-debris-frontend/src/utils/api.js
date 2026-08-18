@@ -125,6 +125,19 @@ export async function clearHistory() {
   return parseJson(res)
 }
 
+export async function getUsers() {
+  const res = await authFetch('/admin/users')
+  return parseJson(res)
+}
+
+export async function updateUser(userId, payload) {
+  const res = await authFetch(`/admin/users/${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
+  return parseJson(res)
+}
+
 export function generateDebrisField(count = 80) {
   return Array.from({ length: count }, (_, i) => {
     const theta = Math.random() * Math.PI * 2

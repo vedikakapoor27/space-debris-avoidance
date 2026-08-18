@@ -3,9 +3,15 @@
   import { cubicOut, elasticOut } from 'svelte/easing'
   import { predict } from '../utils/api.js'
   import { prediction, pushTelemetry } from '../stores/appStore.js'
+  import { authStore } from '../stores/authStore.js'
+  import { canPredict } from '../utils/permissions.js'
+  import AccessDenied from './AccessDenied.svelte'
 
   let loading = false, error = null
   let dist_km = 50, rel_vel = 7, approach = -5
+
+  $: role = $authStore.user?.role || 'viewer'
+  $: allowed = canPredict(role)
 
   async function runPrediction() {
     loading = true; error = null; prediction.set(null)
@@ -23,6 +29,13 @@
 </script>
 
 <div class="pp">
+  {#if !allowed}
+    <AccessDenied
+      title="Prediction Locked"
+      message="Only operators and administrators can run collision risk predictions."
+      role={role}
+    />
+  {:else}
 
   <div class="pp-header">
     <div class="pp-eyebrow">ML Analysis</div>
@@ -131,6 +144,7 @@
     </div>
 
   </div>
+  {/if}
 </div>
 
 <style>

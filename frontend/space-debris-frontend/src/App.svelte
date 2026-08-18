@@ -9,11 +9,13 @@
   import ConjunctionsPanel from './components/ConjunctionsPanel.svelte'
   import TelemetryPanel from './components/TelemetryPanel.svelte'
   import HistoryPanel from './components/HistoryPanel.svelte'
+  import AdminPanel from './components/AdminPanel.svelte'
   import AuthScreen from './components/AuthScreen.svelte'
   import { activePanel, backendOnline, globeRotating } from './stores/appStore.js'
   import { authStore, initAuth, clearSession } from './stores/authStore.js'
   import { checkHealth, getMe } from './utils/api.js'
   import { theme } from './stores/appStore.js'
+  import { canAccessPanel, firstAllowedPanel, roleLabel } from './utils/permissions.js'
 
   let clockStr = '--:--:--'
   let showUserMenu = false
@@ -55,9 +57,17 @@
     predict:      'Risk Analysis',
     conjunctions: 'Conjunctions',
     telemetry:    'Telemetry',
-    history:      'History'
+    history:      'History',
+    admin:        'Administration',
+  }
+
+  $: role = $authStore.user?.role || 'viewer'
+  $: if ($authStore.isAuthenticated && !canAccessPanel(role, $activePanel)) {
+    activePanel.set(firstAllowedPanel(role))
   }
 </script>
+
+<svelte:window on:click={handleWindowClick} />
 
 {#if $authStore.loading}
   <div class="boot-screen" data-theme={$theme}>
@@ -66,8 +76,6 @@
 {:else if !$authStore.isAuthenticated}
   <AuthScreen />
 {:else}
-<svelte:window on:click={handleWindowClick} />
-
 <div class="app" data-theme={$theme} on:click|stopPropagation>
   <Sidebar />
 
@@ -123,7 +131,7 @@
     {#if showUserMenu}
       <div class="user-menu" transition:fade={{ duration: 120 }}>
         <div class="user-name">{$authStore.user?.username}</div>
-        <div class="user-role">{$authStore.user?.role}</div>
+        <div class="user-role">{roleLabel($authStore.user?.role)}</div>
         <button class="logout-btn" on:click={logout}>Sign Out</button>
       </div>
     {/if}
@@ -163,6 +171,8 @@
               <TelemetryPanel />
             {:else if $activePanel === 'history'}
               <HistoryPanel />
+            {:else if $activePanel === 'admin'}
+              <AdminPanel />
             {/if}
           </div>
         {/key}
