@@ -21,8 +21,26 @@ def register():
         if not all([username, email, password]):
             return jsonify({'status': 'error', 'message': 'All fields required'}), 400
 
-        if len(password) < 6:
-            return jsonify({'status': 'error', 'message': 'Password must be at least 6 characters'}), 400
+        if len(password) < 8:
+            return jsonify({'status': 'error', 'message': 'Password must be at least 8 characters'}), 400
+
+        if not any(c.isupper() for c in password):
+            return jsonify({'status': 'error', 'message': 'Password must include an uppercase letter'}), 400
+
+        if not any(c.islower() for c in password):
+            return jsonify({'status': 'error', 'message': 'Password must include a lowercase letter'}), 400
+
+        if not any(c.isdigit() for c in password):
+            return jsonify({'status': 'error', 'message': 'Password must include a number'}), 400
+
+        if not any(not c.isalnum() for c in password):
+            return jsonify({'status': 'error', 'message': 'Password must include a special character'}), 400
+
+        if not username.replace('_', '').isalnum():
+            return jsonify({'status': 'error', 'message': 'Username can only contain letters, numbers, and underscores'}), 400
+
+        if len(username) < 3 or len(username) > 20:
+            return jsonify({'status': 'error', 'message': 'Username must be 3-20 characters'}), 400
 
         if User.query.filter_by(username=username).first():
             return jsonify({'status': 'error', 'message': 'Username already exists'}), 409
