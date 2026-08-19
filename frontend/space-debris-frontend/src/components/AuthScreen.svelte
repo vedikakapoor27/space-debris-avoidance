@@ -258,13 +258,23 @@
         <label class="field">
           <span>Password</span>
           <div class="password-wrap">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              bind:value={password}
-              placeholder="Enter password"
-              autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
-              required
-            />
+            {#if showPassword}
+              <input
+                type="text"
+                bind:value={password}
+                placeholder="Enter password"
+                autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
+                required
+              />
+            {:else}
+              <input
+                type="password"
+                bind:value={password}
+                placeholder="Enter password"
+                autocomplete={mode === 'login' ? 'current-password' : 'new-password'}
+                required
+              />
+            {/if}
             <button class="eye-btn" type="button" on:click={() => (showPassword = !showPassword)}>
               {showPassword ? 'Hide' : 'Show'}
             </button>
@@ -274,13 +284,23 @@
         {#if mode === 'register'}
           <label class="field" in:fade={{ duration: 120 }}>
             <span>Confirm Password</span>
-            <input
-              type={showPassword ? 'text' : 'password'}
-              bind:value={confirmPassword}
-              placeholder="Re-enter password"
-              autocomplete="new-password"
-              required
-            />
+            {#if showPassword}
+              <input
+                type="text"
+                bind:value={confirmPassword}
+                placeholder="Re-enter password"
+                autocomplete="new-password"
+                required
+              />
+            {:else}
+              <input
+                type="password"
+                bind:value={confirmPassword}
+                placeholder="Re-enter password"
+                autocomplete="new-password"
+                required
+              />
+            {/if}
             {#if confirmPassword && !passwordsMatch}
               <span class="field-hint bad">Passwords do not match</span>
             {/if}
